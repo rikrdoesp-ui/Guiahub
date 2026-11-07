@@ -8,42 +8,64 @@
     <!-- Silueta de El Tornillo: tramos que se desplazan de lado a lado (giro) y se afinan hacia arriba -->
     <path id="tornillo" d="M41.1 46 C41.1 43.2 43.1 43.2 43.1 40.4 C43.1 37.6 41.5 37.6 41.5 34.8 C41.5 32 43.5 32 43.5 29.2 C43.5 26.4 41.9 26.4 41.9 23.6 C41.9 20.8 43.9 20.8 43.9 18 C43.9 15.2 42.3 15.2 42.3 12.4 Q42.6 8.5 47 7.5 Q49.6 8.5 49.9 12.4 C49.9 15.2 51.9 15.2 51.9 18 C51.9 20.8 50.3 20.8 50.3 23.6 C50.3 26.4 52.3 26.4 52.3 29.2 C52.3 32 50.7 32 50.7 34.8 C50.7 37.6 52.7 37.6 52.7 40.4 C52.7 43.2 51.1 43.2 51.1 46 Z"/>
     <clipPath id="torre"><use href="#tornillo"/></clipPath>
+    <!-- La torre solo se ve por encima del tablero (detrás del puente) -->
+    <clipPath id="sobre"><rect width="64" height="40"/></clipPath>
+    <!-- Puente de las Américas -->
+    <!-- Cuerda superior continua: tramos laterales que suben + gran arco central -->
+    <path id="cuerda" d="M1 40.5 Q7 39 13 35 Q32 8 51 35 Q57 39 63 40.5"/>
+    <!-- Cuerda inferior del arco: baja por debajo del tablero hasta los pilares -->
+    <path id="arco" d="M14 49 Q32 19 50 49"/>
+    <!-- Celosía en zigzag del arco y de los tramos laterales -->
+    <path id="celosia" d="M14 49 L16.8 30.1 L21.2 39.4 L24.4 23.7 L28.4 34.6 L32 21.5 L35.6 34.6 L39.6 23.7 L42.8 39.4 L47.2 30.1 L50 49 M3 40 L5.5 39 L8 40 L10.5 36.6 L13 40 M61 40 L58.5 39 L56 40 L53.5 36.6 L51 40"/>
+    <!-- Péndolas bajo el arco y tablero -->
+    <path id="pendolas" d="M25 36.3 V40 M32 34 V40 M39 36.3 V40"/>
+    <path id="tablero" d="M1 40 H63"/>
   </defs>
 
   <!-- Fondo -->
   <rect width="64" height="64" rx="15" fill="url(#cielo)"/>
 
   <!-- Sol -->
-  <circle cx="16" cy="18" r="6" fill="#e9b45a"/>
+  <circle cx="14" cy="15" r="5.5" fill="#e9b45a"/>
 
   <!-- Torre El Tornillo -->
-  <path d="M47 7.5 V3.8" stroke="#f5efe3" stroke-width="1" stroke-linecap="round"/>
-  <use href="#tornillo" fill="#f5efe3"/>
-  <g clip-path="url(#torre)">
-    <rect x="47.4" y="0" width="12" height="50" fill="#1f4a36" opacity=".18"/>
-    <path d="M38 47 L56 41.5 M38 41.4 L56 35.9 M38 35.8 L56 30.3 M38 30.2 L56 24.7 M38 24.6 L56 19.1 M38 19 L56 13.5 M38 13.4 L56 7.9" fill="none" stroke="#2f6b4f" stroke-width="1.4"/>
+  <g clip-path="url(#sobre)">
+    <path d="M47 7.5 V3.8" stroke="#f5efe3" stroke-width="1" stroke-linecap="round"/>
+    <use href="#tornillo" fill="#f5efe3"/>
+    <g clip-path="url(#torre)">
+      <rect x="47.4" y="0" width="12" height="50" fill="#1f4a36" opacity=".18"/>
+      <path d="M38 47 L56 41.5 M38 41.4 L56 35.9 M38 35.8 L56 30.3 M38 30.2 L56 24.7 M38 24.6 L56 19.1 M38 19 L56 13.5 M38 13.4 L56 7.9" fill="none" stroke="#2f6b4f" stroke-width="1.4"/>
+    </g>
   </g>
 
-  <!-- Puente de las Américas: arco de armadura metálica.
-       Primero un contorno oscuro para separarlo de la torre. -->
+  <!-- Contorno oscuro del puente para separarlo de la torre -->
   <g fill="none" stroke="#24533d" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M6 50 Q32 14 58 50" stroke-width="5"/>
-    <path d="M10 50 Q32 22 54 50" stroke-width="4.4"/>
-    <path d="M3 42 H61" stroke-width="5"/>
+    <use href="#cuerda" stroke-width="4.6"/>
+    <use href="#arco" stroke-width="4.2"/>
+    <use href="#tablero" stroke-width="4.8"/>
   </g>
+
+  <!-- Pilares de concreto -->
+  <g fill="#e3d7c0">
+    <rect x="12" y="46.5" width="4" height="7.5" rx=".8"/>
+    <rect x="48" y="46.5" width="4" height="7.5" rx=".8"/>
+  </g>
+  <g stroke="#e3d7c0" stroke-width="1.6" stroke-linecap="round">
+    <path d="M5 41.5 V53 M59 41.5 V53"/>
+  </g>
+
+  <!-- Estructura metálica -->
   <g fill="none" stroke="#f5efe3" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Cuerdas superior e inferior del arco -->
-    <path d="M6 50 Q32 14 58 50" stroke-width="2.2"/>
-    <path d="M10 50 Q32 22 54 50" stroke-width="1.6"/>
-    <!-- Celosía en zigzag entre las cuerdas -->
-    <path d="M12.2 47.3 L11.2 43.5 L16.6 42.9 L16.4 38.5 L21 39.5 L21.6 34.9 L25.4 37.3 L26.8 32.7 L29.8 36.1 L32 32 L34.2 36.1 L37.2 32.7 L38.6 37.3 L42.4 34.9 L43 39.5 L47.6 38.5 L47.4 42.9 L52.8 43.5 L51.8 47.3" stroke-width="1"/>
-    <!-- Tablero -->
-    <path d="M3 42 H61" stroke-width="2.4"/>
+    <use href="#cuerda" stroke-width="2.2"/>
+    <use href="#arco" stroke-width="1.8"/>
+    <use href="#celosia" stroke-width=".95"/>
+    <use href="#pendolas" stroke-width=".9"/>
+    <use href="#tablero" stroke-width="2.4"/>
   </g>
 
   <!-- Agua del canal -->
-  <g fill="none" stroke="#f5efe3" stroke-linecap="round" stroke-width="1.4" opacity=".45">
-    <path d="M10 54 q4 -2 8 0 t8 0 t8 0 t8 0 t8 0 t8 0"/>
-    <path d="M18 58 q4 -2 8 0 t8 0 t8 0 t8 0"/>
+  <g fill="none" stroke="#f5efe3" stroke-linecap="round" stroke-width="1.3" opacity=".45">
+    <path d="M18 56 q4 -2 8 0 t8 0 t8 0 t8 0"/>
+    <path d="M8 60 q4 -2 8 0 t8 0 t8 0 t8 0 t8 0 t8 0"/>
   </g>
 </svg>
