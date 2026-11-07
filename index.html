@@ -226,6 +226,14 @@ body.dr-open .drawer{transform:none}
 .dayrow.mod input{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
 .grpbox{grid-column:1/-1;background:var(--primary-soft);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .grp-actions{display:flex;gap:6px;flex-wrap:wrap}
+.grp-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.glab{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:disabled:hover{background:var(--surface)}
+.crow{display:grid;grid-template-columns:minmax(0,1fr) 84px 84px 32px;gap:6px;align-items:center;margin-bottom:6px}
+.crow input{width:100%;padding:6px 8px}
+.crow .icon-btn{width:32px;height:32px;font-size:14px}
+.crow-h{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
 .gtag{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--primary-soft);color:var(--primary);vertical-align:1px}
 .hide{display:none!important}
 
@@ -260,6 +268,13 @@ body.dr-open .drawer{transform:none}
   .form{grid-template-columns:1fr 1fr}
   .row{padding:10px}
   .row-actions .qa{width:32px;height:32px}
+  /* Días del circuito: fecha arriba, tarifa y gastos abajo */
+  .crow{grid-template-columns:1fr 1fr 32px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+  .crow input[data-cf="date"]{grid-column:1/3;grid-row:1}
+  .crow .icon-btn{grid-column:3;grid-row:1}
+  .crow input[data-cf="rate"]{grid-column:1;grid-row:2}
+  .crow input[data-cf="expenses"]{grid-column:2;grid-row:2}
+  .crow-h{display:none}
   table.resp thead{display:none}
   table.resp,table.resp tbody,table.resp tr,table.resp td,table.resp tfoot{display:block;width:100%}
   table.resp tr{border:1px solid var(--border);border-radius:12px;margin-bottom:10px;padding:6px 10px;background:var(--surface)}
@@ -605,8 +620,18 @@ function openForm(id, date, copyFrom){
   if (s.groupId){
     const g = grpOf(s.groupId);
     const tot = g.reduce((a,x) => a + due(x), 0);
-    grpBox = `<div class="grpbox full"><div><b>Circuito · Día ${s.groupDay} de ${s.groupTotal}</b><br><span class="muted">${fmtDate(g[0].date)} – ${fmtDate(g[g.length-1].date)} · ${g.length} días · Total ${money(tot)}</span></div>
-      <div class="grp-actions"><button type="button" class="btn sm" data-act="grp-done" data-g="${s.groupId}">✓ Circuito realizado</button><button type="button" class="btn sm" data-act="grp-pay" data-g="${s.groupId}">$ Circuito pagado</button><button type="button" class="btn sm danger" data-act="grp-del" data-g="${s.groupId}">Eliminar circuito</button></div>
+    const dis = ok => ok ? '' : ' disabled';
+    const canPay = x => x.payStatus !== 'pagado' && due(x) > 0;
+    const dayCanDone = s.status === 'programado', dayCanPay = canPay(s);
+    const grpCanDone = g.some(x => x.status === 'programado'), grpCanPay = g.some(canPay);
+    grpBox =`<div class="grpbox full"><div><b>Circuito · Día ${s.groupDay} de ${s.groupTotal}</b><br><span class="muted">${fmtDate(g[0].date)} – ${fmtDate(g[g.length-1].date)} · ${g.length} días · Total ${money(tot)}</span></div>
+      <div class="grp-row"><span class="glab">Este día</span>
+        <button type="button" class="btn sm" data-act="day-done" data-id="${s.id}"${dis(dayCanDone)} title="Marcar solo este día como realizado">✓ Día realizado</button>
+        <button type="button" class="btn sm" data-act="day-pay" data-id="${s.id}"${dis(dayCanPay)} title="Marcar solo este día como pagado">$ Día pagado</button></div>
+      <div class="grp-row"><span class="glab">Todo el circuito</span>
+        <button type="button" class="btn sm" data-act="grp-done" data-g="${s.groupId}" data-id="${s.id}"${dis(grpCanDone)}>✓ Circuito realizado</button>
+        <button type="button" class="btn sm" data-act="grp-pay" data-g="${s.groupId}" data-id="${s.id}"${dis(grpCanPay)}>$ Circuito pagado</button></div>
+      <div class="grp-actions"><button type="button" class="btn sm primary" data-act="grp-edit" data-g="${s.groupId}">✎ Editar circuito</button><button type="button" class="btn sm danger" data-act="grp-del" data-g="${s.groupId}">Eliminar circuito</button></div>
       <div class="muted" style="font-size:12px">Los cambios de este formulario aplican solo a este día.</div></div>`;
   }
   const sel = (name, val, opts) => `<select name="${name}">${opts.map(([v,l]) => `<option value="${v}"${v === val ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
@@ -830,6 +855,174 @@ function grpDel(gid){
   const g = grpOf(gid);
   if (!confirm(`¿Eliminar el circuito completo (${g.length} días)? No se puede deshacer.`)) return;
   S.services = S.services.filter(x => x.groupId !== gid); save(); closeDrawer(); render(); toast('Circuito eliminado');
+}
+
+/* ================= Editar circuito completo =================
+   Datos generales (hora, pax, proveedor, tour, notas, estado, pago) se aplican a todos los días
+   solo si el usuario los cambia; fechas, tarifas y gastos se editan día por día. */
+function openCircuitForm(gid){
+  ui.dayOpen = null;
+  const g = grpOf(gid); if (!g.length) return;
+  const f0 = g[0];
+  const mix = k => !g.every(x => String(x[k] ?? '') === String(f0[k] ?? ''));
+  const st = mix('status') ? '__mix' : f0.status, pay = mix('payStatus') ? '__mix' : f0.payStatus;
+  const paidTot = g.reduce((a,x) => a + paid(x), 0);
+  const lastPaid = g.map(x => x.paidDate).filter(Boolean).sort().pop() || '';
+  const varia = k => mix(k) ? ' <span style="font-weight:500">(varía)</span>' : '';
+  const sel = (name, val, list) => `<select name="${name}">${val === '__mix' ? '<option value="__mix" selected>— Varía por día (sin cambio) —</option>' : ''}${list.map(([v,l]) => `<option value="${v}"${v === val ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
+  openDrawer(`<div class="dr-head"><h3>Editar circuito</h3><button class="icon-btn" data-act="close" aria-label="Cerrar">✕</button></div>
+  <form id="fc" class="form" autocomplete="off" novalidate>
+    <div class="grpbox full"><div><b>Circuito de ${g.length} días</b><br><span class="muted">${fmtDate(f0.date)} – ${fmtDate(g[g.length-1].date)}</span></div>
+      <div class="muted" style="font-size:12px">Lo que cambies arriba se aplica a todos los días; lo que no toques se conserva día por día.</div></div>
+    <label>Mover inicio a<input type="date" name="start" value="${esc(f0.date)}"></label>
+    <label>Hora${varia('time')}<input type="time" name="time" value="${mix('time') ? '' : esc(f0.time)}"></label>
+    <label>Nº de pasajeros${varia('pax')}<input type="number" name="pax" min="1" step="1" value="${esc(f0.pax)}"></label>
+    <div></div>
+    <label class="full">Proveedor${varia('providerId')}<select name="providerId">${provOptions(f0.providerId)}</select></label>
+    <label class="full">Tour${varia('tourId')}<select name="tourId">${tourOptions(f0.tourId)}</select></label>
+    <div class="hint" id="cHint"></div>
+    <div class="days" id="cDays"></div>
+    <div class="sep">Estado de todo el circuito</div>
+    <label>Servicio${sel('status', st, [['programado','Programado'],['realizado','Realizado'],['cancelado','Cancelado']])}</label>
+    <label>Pago${sel('payStatus', pay, [['pendiente','Pendiente'],['parcial','Parcial'],['pagado','Pagado']])}</label>
+    <label id="c-paidAmount">Monto cobrado total ($)<input type="number" name="paidAmount" min="0" step="0.01" value="${paidTot ? Math.round(paidTot*100)/100 : ''}" placeholder="0.00"></label>
+    <label id="c-paidDate">Fecha de cobro<input type="date" name="paidDate" value="${esc(lastPaid)}"></label>
+    <label class="full">Notas${varia('notes')}<textarea name="notes" rows="2">${esc(f0.notes)}</textarea></label>
+    <div class="fsum" id="cSum"></div>
+    <div class="factions">
+      <div class="r"><button type="button" class="btn danger" data-act="grp-del" data-g="${gid}">Eliminar circuito</button></div>
+      <div class="r"><button type="button" class="btn" data-act="close">Cancelar</button><button type="submit" class="btn primary">Guardar circuito</button></div>
+    </div>
+  </form>`);
+  bindCircuitForm(gid, g);
+}
+function bindCircuitForm(gid, g){
+  const f = $('#fc'), F = n => f.elements[n], dirty = new Set();
+  let rows = g.map(x => ({id:x.id, date:x.date, rate:x.rate ?? '', expenses:x.expenses ?? ''}));
+  const addDays = (ds, n) => { const d = parse(ds); return ymd(new Date(d.getFullYear(), d.getMonth(), d.getDate() + n)); };
+  const totals = () => {
+    const tot = rows.reduce((a,r) => a + num(r.rate), 0), exp = rows.reduce((a,r) => a + num(r.expenses), 0);
+    $('#cSum').innerHTML = `<span>Días: <b>${rows.length}</b></span><span>Total tarifas: <b>${money(tot)}</b></span><span>Neto: <b>${money(tot - exp)}</b></span>`;
+    const h = $('#cDays .days-h span'); if (h) h.textContent = 'Total ' + money(tot);
+  };
+  const renderRows = () => {
+    $('#cDays').innerHTML = `<div class="days-h"><b>Días del circuito</b><span></span></div>
+      <div class="crow crow-h"><span>Fecha</span><span>Tarifa $</span><span>Gastos $</span><span></span></div>
+      ${rows.map((r,i) => `<div class="crow">
+        <input type="date" value="${esc(r.date)}" data-ci="${i}" data-cf="date" aria-label="Fecha día ${i+1}">
+        <input type="number" min="0" step="0.01" value="${esc(r.rate)}" placeholder="Tarifa $" data-ci="${i}" data-cf="rate" aria-label="Tarifa día ${i+1}">
+        <input type="number" min="0" step="0.01" value="${esc(r.expenses)}" placeholder="Gastos $" data-ci="${i}" data-cf="expenses" aria-label="Gastos día ${i+1}">
+        <button type="button" class="icon-btn" data-crm="${i}" title="Quitar este día"${rows.length <= 2 ? ' disabled style="visibility:hidden"' : ''}>✕</button></div>`).join('')}
+      <button type="button" class="btn sm" data-cadd="1" style="margin-top:4px">+ Agregar día al final</button>`;
+    totals();
+  };
+  const toggles = () => {
+    const p = F('payStatus').value;
+    $('#c-paidAmount').classList.toggle('hide', p !== 'parcial');
+    $('#c-paidDate').classList.toggle('hide', p === 'pendiente' || p === '__mix');
+  };
+  const suggest = () => {
+    const p = F('providerId').value, t = F('tourId').value, pax = parseInt(F('pax').value) || 1, hint = $('#cHint');
+    hint.className = 'hint';
+    if (!p || !t || p === '__new' || t === '__new'){ hint.innerHTML = ''; return; }
+    const r = findRate(p, t, pax);
+    if (r){
+      const all = rows.every(x => num(x.rate) === r.rate);
+      hint.innerHTML = `<span>Tarifa sugerida: <b>${money(r.rate)}</b> por día (rango ${rangeLabel(r.g)} pax)</span>` + (all ? '' : `<a data-capply="${r.rate}">Aplicar a todos los días</a>`);
+    } else {
+      hint.classList.add('no');
+      hint.innerHTML = `<span>No hay tarifa para ${pax} pax con este proveedor y tour.</span>`;
+    }
+  };
+  const pickNew = (name, label, add, opts) => {
+    if (F(name).value !== '__new') return;
+    const n = prompt(label);
+    if (n && n.trim()){ const x = add(n.trim()); F(name).innerHTML = opts(x ? x.id : ''); }
+    else F(name).value = g[0][name];
+  };
+  f.addEventListener('input', e => {
+    const t = e.target;
+    if (t.dataset.cf){ rows[+t.dataset.ci][t.dataset.cf] = t.value; totals(); if (t.dataset.cf === 'rate') suggest(); return; }
+    if (t.name) dirty.add(t.name);
+    if (t.name === 'pax') suggest();
+  });
+  f.addEventListener('change', e => {
+    const t = e.target; if (!t.name) return;
+    dirty.add(t.name);
+    if (t.name === 'providerId') pickNew('providerId', 'Nombre del nuevo proveedor:', addProvider, provOptions);
+    if (t.name === 'tourId') pickNew('tourId', 'Nombre del nuevo tour:', addTour, tourOptions);
+    if (t.name === 'start' && t.value){
+      const first = rows.map(r => r.date).filter(Boolean).sort()[0];
+      if (first){ const delta = daysBetween(first, t.value); rows.forEach(r => { if (r.date) r.date = addDays(r.date, delta); }); renderRows(); }
+    }
+    if (t.name === 'payStatus' && t.value !== 'pendiente' && t.value !== '__mix' && !F('paidDate').value) F('paidDate').value = today();
+    toggles(); suggest();
+  });
+  f.addEventListener('click', e => {
+    const ap = e.target.closest('[data-capply]');
+    if (ap){ rows.forEach(r => { r.rate = ap.dataset.capply; }); renderRows(); suggest(); return; }
+    const rm = e.target.closest('[data-crm]');
+    if (rm && rows.length > 2){ rows.splice(+rm.dataset.crm, 1); renderRows(); suggest(); return; }
+    if (e.target.closest('[data-cadd]')){
+      const last = rows.map(r => r.date).filter(Boolean).sort().pop() || today();
+      if (rows.length >= 31) return toast('Máximo 31 días por circuito');
+      rows.push({id:null, date:addDays(last, 1), rate:rows[rows.length-1].rate, expenses:''}); renderRows(); suggest();
+    }
+  });
+  f.addEventListener('submit', e => {
+    e.preventDefault();
+    const prov = F('providerId').value, tour = F('tourId').value, st = F('status').value, pay = F('payStatus').value;
+    if (!prov || prov === '__new') return toast('Selecciona un proveedor');
+    if (!tour || tour === '__new') return toast('Selecciona un tour');
+    if (rows.some(r => !r.date)) return toast('Falta la fecha de algún día');
+    if (new Set(rows.map(r => r.date)).size !== rows.length) return toast('Hay dos días con la misma fecha');
+    const payDirty = ['payStatus','paidAmount','paidDate'].some(k => dirty.has(k)) && pay !== '__mix';
+    if (payDirty && pay === 'parcial' && !(num(F('paidAmount').value) > 0)) return toast('Indica el monto cobrado del pago parcial');
+    const finalSt = s => (st !== '__mix' && dirty.has('status')) ? st : s.status;
+    if (rows.some(r => !(num(r.rate) > 0)) && st !== 'cancelado' && !confirm('Hay días del circuito sin tarifa ($0). ¿Guardar así?')) return;
+
+    // Quitar los días eliminados y crear los nuevos (copiando los datos del día 1)
+    const keep = new Set(rows.filter(r => r.id).map(r => r.id)), base = g[0];
+    S.services = S.services.filter(x => x.groupId !== gid || keep.has(x.id));
+    const list = rows.map(r => {
+      let s = r.id && S.services.find(x => x.id === r.id);
+      if (!s){
+        s = Object.assign({}, base, {id:uid(), status: st !== '__mix' && st !== 'cancelado' ? st : 'programado', payStatus:'pendiente', paidAmount:'', paidDate:'', tip:'', cancelFee:''});
+        S.services.push(s);
+      }
+      s.date = r.date; s.rate = String(r.rate ?? ''); s.expenses = r.expenses ?? '';
+      if (dirty.has('time')) s.time = F('time').value;
+      if (dirty.has('pax')) s.pax = Math.max(1, parseInt(F('pax').value) || 1);
+      if (dirty.has('providerId')) s.providerId = prov;
+      if (dirty.has('tourId')) s.tourId = tour;
+      if (dirty.has('notes')) s.notes = F('notes').value.trim();
+      s.status = finalSt(s);
+      if (s.status !== 'cancelado') s.cancelFee = '';
+      return s;
+    }).sort((a,b) => a.date.localeCompare(b.date));
+
+    if (payDirty){
+      let left = num(F('paidAmount').value);
+      const pd = F('paidDate').value || today();
+      list.forEach(s => {
+        const d = due(s);
+        if (pay === 'pagado'){ s.payStatus = 'pagado'; s.paidAmount = String(d); s.paidDate = pd; }
+        else if (pay === 'pendiente'){ s.payStatus = 'pendiente'; s.paidAmount = ''; s.paidDate = ''; }
+        else {
+          const take = Math.min(left, d); left -= take;
+          if (take <= 0){ s.payStatus = 'pendiente'; s.paidAmount = ''; s.paidDate = ''; }
+          else { s.payStatus = take >= d ? 'pagado' : 'parcial'; s.paidAmount = String(take); s.paidDate = pd; }
+        }
+      });
+    }
+    // Renumerar días; si queda uno solo deja de ser circuito
+    list.forEach((s, i) => {
+      if (list.length === 1){ delete s.groupId; delete s.groupDay; delete s.groupTotal; }
+      else { s.groupId = gid; s.groupDay = i + 1; s.groupTotal = list.length; }
+    });
+    save(); closeDrawer(); render(); toast(`Circuito actualizado · ${list.length} días`);
+  });
+  renderRows(); toggles(); suggest();
 }
 
 /* ================= Dashboard ================= */
@@ -1116,8 +1309,12 @@ document.addEventListener('click', e => {
     case 'edit': openForm(id); break;
     case 'dup': openForm(null, null, S.services.find(x => x.id === id)); toast('Copia lista: ajusta la fecha y guarda'); break;
     case 'del': delService(id); break;
-    case 'grp-done': grpDone(t.dataset.g); break;
-    case 'grp-pay': grpPay(t.dataset.g); break;
+    // Acciones del formulario de un día de circuito: aplican y reabren el mismo día actualizado
+    case 'day-done': markDone(id); openForm(id); break;
+    case 'day-pay': markPaid(id); openForm(id); break;
+    case 'grp-done': grpDone(t.dataset.g); if (id) openForm(id); break;
+    case 'grp-pay': grpPay(t.dataset.g); if (id) openForm(id); break;
+    case 'grp-edit': openCircuitForm(t.dataset.g); break;
     case 'grp-del': grpDel(t.dataset.g); break;
     case 'done': markDone(id); break;
     case 'pay': markPaid(id); break;
