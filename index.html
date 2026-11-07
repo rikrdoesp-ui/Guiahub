@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Servicios de Guía</title>
+<style>
+:root{
+  --bg:#f5efe3; --surface:#fffdf8; --surface2:#efe6d3; --text:#2a2a22; --muted:#7a7262; --border:#e3d7c0;
+  --primary:#2f6b4f; --primary-2:#3d8763; --primary-soft:#dcebe1; --accent:#c4663a;
+  --st-prog:#d8d2c3; --st-prog-t:#4a463c; --st-pend:#d24a43; --st-parc:#e5922b; --st-pag:#3a9a5b; --st-canc:#3b3a36;
+  --shadow:0 1px 2px rgba(60,45,20,.06),0 4px 14px rgba(60,45,20,.06);
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#171a15; --surface:#20241d; --surface2:#2a2f26; --text:#ece6d6; --muted:#a39b88; --border:#363c30;
+    --primary:#5cab82; --primary-2:#73c096; --primary-soft:#26392d; --accent:#e08a5a;
+    --st-prog:#4a4940; --st-prog-t:#ddd6c4; --st-pend:#e0605a; --st-parc:#eba04a; --st-pag:#4fb373; --st-canc:#77756c;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;font-family:Georgia,"Times New Roman",serif;font-weight:600;letter-spacing:.2px}
+
+/* Header */
+.top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border)}
+.top-in{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.brand svg{flex:none}
+.brand h1{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;gap:4px}
+.tabs button{border:0;background:none;padding:10px 14px;border-bottom:3px solid transparent;color:var(--muted);cursor:pointer;font-weight:500}
+.tabs button.on{color:var(--primary);border-color:var(--primary)}
+.tabs button:hover{color:var(--text)}
+.bottomnav{display:none}
+
+main{max-width:1200px;margin:0 auto;padding:20px}
+section{display:none}
+section.on{display:block}
+
+/* Buttons */
+.btn{border:1px solid var(--border);background:var(--surface);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:500;white-space:nowrap}
+.btn:hover{background:var(--surface2)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.primary:hover{background:var(--primary-2)}
+.btn.danger{color:var(--st-pend);border-color:var(--st-pend);background:transparent}
+.btn.ghost{background:transparent}
+.btn.sm{padding:5px 10px;font-size:13px}
+.icon-btn{border:1px solid var(--border);background:var(--surface);width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.icon-btn:hover{background:var(--surface2)}
+.hdr-actions{display:flex;gap:8px}
+
+/* Toolbar */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.monthnav{display:flex;align-items:center;gap:8px}
+.monthnav h2{font-size:22px;min-width:170px;text-align:center}
+.toolbar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--surface2);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:500}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .l{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:600}
+.kpi .v{font-size:24px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--muted);margin-top:2px}
+.kpi.k-net .v{color:var(--primary)}
+.kpi.k-pend .v{color:var(--st-pend)}
+.kpi.k-tip .v{color:var(--accent)}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 12px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:4px;display:inline-block}
+
+/* Status colors */
+.st-programado{background:var(--st-prog);color:var(--st-prog-t)}
+.st-pendiente{background:var(--st-pend);color:#fff}
+.st-parcial{background:var(--st-parc);color:#fff}
+.st-pagado{background:var(--st-pag);color:#fff}
+.st-cancelado{background:var(--st-canc);color:#eee;text-decoration:line-through}
+/* Marcas extra: programado con anticipo (verde) y cancelación con penalidad por cobrar (rojo) */
+.pp{outline:2px solid var(--st-pag);outline-offset:-2px}
+.owe{outline:2px solid var(--st-pend);outline-offset:-2px}
+
+/* Calendar */
+.cal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);background:var(--surface2);font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.cal-head div{padding:8px 10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cell{min-height:112px;border-top:1px solid var(--border);border-left:1px solid var(--border);padding:6px;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-width:0;transition:background .12s}
+.cell:nth-child(7n+1){border-left:0}
+.cell:hover{background:var(--primary-soft)}
+.cell.other{background:color-mix(in srgb,var(--surface2) 45%,transparent)}
+.cell.other .dnum{opacity:.45}
+.dnum{font-size:13px;font-weight:600;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.cell.today .dnum{background:var(--primary);color:#fff}
+.chips{display:flex;flex-direction:column;gap:3px;min-width:0}
+.chip{font-size:12px;padding:3px 6px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.chip:hover{filter:brightness(1.07)}
+.more{font-size:12px;color:var(--primary);font-weight:600;padding:0 4px}
+.dots{display:none;flex-wrap:wrap;gap:3px;justify-content:center}
+.dot{width:8px;height:8px;border-radius:50%}
+
+/* Lists / rows */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+.card h3{font-size:17px;margin-bottom:12px}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.card-h h3{margin:0}
+.group-date{font-size:13px;font-weight:700;color:var(--muted);text-transform:capitalize;margin:14px 0 6px}
+.group-date:first-child{margin-top:0}
+.row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer}
+.row:hover{border-color:var(--primary)}
+.row .bar{width:6px;align-self:stretch;border-radius:4px;flex:none}
+.row-main{flex:1;min-width:0}
+.row-title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{font-size:13px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:2px}
+.row-amt{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.row-amt small{display:block;font-weight:500;color:var(--st-pend);font-size:12px}
+.row-actions{display:flex;gap:6px}
+.qa{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-weight:700;font-size:15px}
+.qa.done{color:var(--primary)}
+.qa.pay{color:var(--st-pag)}
+.qa:hover{border-color:var(--primary)}
+
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.b-programado{background:var(--st-prog);color:var(--st-prog-t)}
+.b-realizado{background:var(--primary-soft);color:var(--primary)}
+.b-cancelado{background:var(--st-canc);color:#eee}
+.p-pendiente{background:color-mix(in srgb,var(--st-pend) 16%,transparent);color:var(--st-pend)}
+.p-parcial{background:color-mix(in srgb,var(--st-parc) 18%,transparent);color:var(--st-parc)}
+.p-pagado{background:color-mix(in srgb,var(--st-pag) 16%,transparent);color:var(--st-pag)}
+
+.empty{text-align:center;padding:36px 16px;color:var(--muted)}
+.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:4px}
+
+/* Filters */
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
+.filters label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
+select,input[type=text],input[type=number],input[type=date],input[type=time],textarea{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 10px;min-width:0}
+select:focus,input:focus,textarea:focus{outline:2px solid color-mix(in srgb,var(--primary) 45%,transparent);border-color:var(--primary)}
+
+/* Tables */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover{background:var(--primary-soft)}
+tfoot td{font-weight:700;border-bottom:0}
+
+/* Dashboard */
+.dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+.bars{display:flex;align-items:flex-end;gap:8px;height:220px;padding-top:18px}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+.btrack{flex:1;min-height:0;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.bwrap{position:relative;width:100%;max-width:38px;min-height:2px}
+.bval{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted);margin-bottom:3px;white-space:nowrap}
+.bstack{width:100%;height:100%;display:flex;flex-direction:column;border-radius:6px 6px 2px 2px;overflow:hidden;min-height:2px;background:var(--surface2)}
+.bp{background:var(--st-pend);opacity:.85}
+.bc{background:var(--st-pag)}
+.blab{font-size:11px;color:var(--muted);margin-top:6px}
+.bcol.sel .blab{color:var(--text);font-weight:700}
+.hbar{display:grid;grid-template-columns:28px minmax(80px,140px) 1fr auto;align-items:center;gap:10px;margin-bottom:10px;font-size:14px}
+.rank{width:26px;height:26px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.hbar:first-of-type .rank{background:var(--accent);color:#fff}
+.hname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.htrack{background:var(--surface2);border-radius:6px;height:14px;overflow:hidden}
+.hfill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-2));border-radius:6px}
+.hval{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.alert{border-left:4px solid var(--st-pend)}
+.alert-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.alert-h h3{margin:0}
+.inline-num{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.inline-num input{width:64px}
+.chart-legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:8px}
+
+/* Rates & providers */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rg-table input{width:100%}
+.rg-table td{padding:6px}
+.warn{color:var(--st-parc);font-size:13px;margin-top:8px}
+.muted{color:var(--muted);font-size:13px}
+.plist{list-style:none;margin:0 0 12px;padding:0}
+.plist li{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.plist li input{flex:1}
+.addline{display:flex;gap:8px}
+.addline input{flex:1}
+
+/* Drawer */
+.overlay{position:fixed;inset:0;background:rgba(20,18,12,.4);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+.drawer{position:fixed;top:0;right:0;height:100%;width:440px;max-width:100%;background:var(--surface);z-index:50;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.15)}
+body.dr-open .overlay{opacity:1;pointer-events:auto}
+body.dr-open .drawer{transform:none}
+#drawerBody{overflow-y:auto;padding:18px 20px 28px;flex:1}
+.dr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px}
+.dr-head h3{font-size:20px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.form > *{min-width:0}
+.form input,.form select,.form textarea{width:100%;min-width:0}
+#drawerBody{overflow-x:hidden}
+.form .full{grid-column:1/-1}
+.form .sep{grid-column:1/-1;border-top:1px solid var(--border);margin:4px 0 0;padding-top:10px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}
+.hint{grid-column:1/-1;font-size:13px;background:var(--primary-soft);color:var(--text);padding:8px 10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hint:empty{display:none}
+.hint.no{background:color-mix(in srgb,var(--st-parc) 15%,transparent)}
+.hint a{color:var(--primary);font-weight:600;cursor:pointer;text-decoration:underline}
+.fsum{grid-column:1/-1;background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:13px;display:flex;gap:14px;flex-wrap:wrap}
+.fsum b{font-variant-numeric:tabular-nums}
+.factions{grid-column:1/-1;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:6px}
+.factions .r{display:flex;gap:8px}
+.days{grid-column:1/-1;background:var(--surface2);border-radius:12px;padding:10px 12px}
+.days-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px}
+.days-h span{font-weight:700;font-variant-numeric:tabular-nums}
+.dayrow{display:grid;grid-template-columns:1fr 110px 32px;gap:8px;align-items:center;margin-bottom:6px}
+.dayrow .dlab{font-size:13px;font-weight:600}
+.dayrow input{width:100%;padding:6px 8px}
+.dayrow .icon-btn{width:32px;height:32px;font-size:15px}
+.dayrow.mod input{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.grpbox{grid-column:1/-1;background:var(--primary-soft);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.grp-actions{display:flex;gap:6px;flex-wrap:wrap}
+.gtag{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--primary-soft);color:var(--primary);vertical-align:1px}
+.hide{display:none!important}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:all .2s;z-index:60;max-width:90vw}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Responsive */
+@media (max-width:900px){
+  .dash-grid,.two{grid-template-columns:1fr}
+}
+@media (max-width:700px){
+  body{font-size:14px}
+  input,select,textarea{font-size:16px} /* iOS hace zoom en campos con letra < 16px */
+  .top-in{padding:10px 16px}
+  .brand h1{font-size:17px}
+  .hdr-actions .btn span{display:none}
+  .tabs{display:none}
+  .bottomnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--border);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .bottomnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;color:var(--muted);padding:4px 0;cursor:pointer}
+  .bottomnav button.on{color:var(--primary);font-weight:600}
+  main{padding:14px 16px 90px}
+  .monthnav h2{font-size:18px;min-width:130px}
+  .toolbar{gap:10px}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{padding:12px}
+  .kpi .v{font-size:19px}
+  .cell{min-height:58px;padding:4px;align-items:center}
+  .chips{display:none}
+  .dots{display:flex}
+  .cal-head div{padding:6px 2px;text-align:center;font-size:11px}
+  .drawer{top:auto;bottom:0;height:auto;max-height:92vh;width:100%;border-radius:18px 18px 0 0;transform:translateY(100%)}
+  .form{grid-template-columns:1fr 1fr}
+  .row{padding:10px}
+  .row-actions .qa{width:32px;height:32px}
+  table.resp thead{display:none}
+  table.resp,table.resp tbody,table.resp tr,table.resp td,table.resp tfoot{display:block;width:100%}
+  table.resp tr{border:1px solid var(--border);border-radius:12px;margin-bottom:10px;padding:6px 10px;background:var(--surface)}
+  table.resp td{display:flex;justify-content:space-between;gap:10px;border:0;padding:5px 0;text-align:right}
+  table.resp td::before{content:attr(data-label);color:var(--muted);font-weight:600;font-size:12px;text-align:left}
+  table.resp td.n{text-align:right}
+  .hbar{grid-template-columns:26px 90px 1fr auto;gap:8px}
+  .bars{gap:4px;height:180px}
+  .bval{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--primary)"/><path d="M6 23l6-8 4 5 3-4 7 7z" fill="#f5efe3"/><circle cx="22" cy="10" r="2.6" fill="#e9b45a"/></svg>
+      <h1>Mis Servicios de Guía</h1>
+    </div>
+    <div class="hdr-actions">
+      <button class="btn sm primary" data-act="export-app" title="Descargar esta app con todos tus datos dentro, para abrirla en otra PC">⇪ <span>Exportar a otra PC</span></button>
+      <button class="btn sm" data-act="export" title="Descargar respaldo JSON">⇩ <span>Respaldo</span></button>
+      <button class="btn sm" data-act="import" title="Importar respaldo JSON">⇧ <span>Importar</span></button>
+      <input type="file" id="importFile" accept="application/json,.json" class="hide">
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-act="tab" data-tab="calendario">Calendario</button>
+    <button data-act="tab" data-tab="dashboard">Dashboard</button>
+    <button data-act="tab" data-tab="servicios">Servicios</button>
+    <button data-act="tab" data-tab="tarifas">Tarifas</button>
+    <button data-act="tab" data-tab="proveedores">Proveedores y tours</button>
+  </nav>
+</header>
+
+<main>
+  <section id="tab-calendario"></section>
+  <section id="tab-dashboard"></section>
+  <section id="tab-servicios"></section>
+  <section id="tab-tarifas"></section>
+  <section id="tab-proveedores"></section>
+</main>
+
+<nav class="bottomnav" id="bottomnav">
+  <button data-act="tab" data-tab="calendario"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendario</button>
+  <button data-act="tab" data-tab="dashboard"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Dashboard</button>
+  <button data-act="tab" data-tab="servicios"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Servicios</button>
+  <button data-act="tab" data-tab="tarifas"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>Tarifas</button>
+  <button data-act="tab" data-tab="proveedores"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7M17 4.5a3.5 3.5 0 010 7M22 21c0-3-1.8-5.5-4.5-6.5"/></svg>Proveedores</button>
+</nav>
+
+<div class="overlay" data-act="close"></div>
+<aside class="drawer" aria-label="Panel"><div id="drawerBody"></div></aside>
+<div class="toast" id="toast"></div>
+
+<script id="embeddedData" type="application/json"></script>
+<script>
+/* Copia limpia del HTML (antes de pintar nada) para poder exportar la app con datos */
+const APP_SOURCE = '<!doctype html>\n' + document.documentElement.outerHTML;
+
+/* ================= Datos ================= */
+const LS_KEY = 'guiaServicios_v1';
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MES_C = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const DIAS = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const DIAS_L = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const ST_LABEL = {programado:'Programado', realizado:'Realizado', cancelado:'Cancelado'};
+const PAY_LABEL = {pendiente:'Pendiente', parcial:'Parcial', pagado:'Pagado'};
+
+/* Limpia datos importados o embebidos: ids seguros, fechas válidas y estados conocidos,
+   para que un respaldo dañado no rompa la app ni inyecte HTML. */
+function normalize(d){
+  d = d || {};
+  const arr = v => Array.isArray(v) ? v.filter(x => x && typeof x === 'object') : [];
+  const sid = v => String(v ?? '').replace(/[^\w-]/g, '');
+  const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  const isDate = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const named = x => Object.assign({}, x, {id: sid(x.id) || newId(), name: String(x.name ?? '').trim() || 'Sin nombre'});
+  const services = arr(d.services).filter(s => isDate(s.date)).map(s => {
+    const o = Object.assign({}, s, {
+      id: sid(s.id) || newId(), providerId: sid(s.providerId), tourId: sid(s.tourId),
+      status: ST_LABEL[s.status] ? s.status : 'programado',
+      payStatus: PAY_LABEL[s.payStatus] ? s.payStatus : 'pendiente',
+      paidDate: isDate(s.paidDate) ? s.paidDate : '',
+      time: typeof s.time === 'string' ? s.time : ''
+    });
+    if (s.groupId){ o.groupId = sid(s.groupId); o.groupDay = parseInt(s.groupDay) || 1; o.groupTotal = parseInt(s.groupTotal) || 1; }
+    else { delete o.groupId; delete o.groupDay; delete o.groupTotal; }
+    return o;
+  });
+  const rates = arr(d.rates).map(r => ({id: sid(r.id) || newId(), providerId: sid(r.providerId), tourId: sid(r.tourId),
+    ranges: arr(r.ranges).map(g => ({min: g.min === '' ? '' : (parseInt(g.min) || 1), max: (g.max === '' || g.max == null) ? '' : (parseInt(g.max) || ''), rate: g.rate === '' ? '' : (parseFloat(g.rate) || 0)}))}));
+  const st = Object.assign({alertDays:15, lastExport:'', embedSeen:''}, (d.settings && typeof d.settings === 'object') ? d.settings : {});
+  st.alertDays = Math.max(1, parseInt(st.alertDays) || 15);
+  st.lastExport = isDate(st.lastExport) ? st.lastExport : '';
+  st.embedSeen = String(st.embedSeen ?? '');
+  return {providers: arr(d.providers).map(named), tours: arr(d.tours).map(named), rates, services, settings: st};
+}
+function readEmbedded(){
+  try {
+    const t = document.getElementById('embeddedData').textContent.trim();
+    if (!t) return null;
+    const d = JSON.parse(t);
+    return (d && Array.isArray(d.services)) ? d : null;
+  } catch(e){ return null; }
+}
+function load(){
+  let local = null;
+  try { const r = localStorage.getItem(LS_KEY); if (r) local = normalize(JSON.parse(r)); } catch(e) {}
+  const emb = readEmbedded();
+  if (emb){
+    const stamp = emb.exportedAt || 'sin-fecha';
+    const hasLocal = local && (local.services.length || local.providers.length || local.tours.length);
+    if (!hasLocal){
+      const d = normalize(emb); d.settings.embedSeen = stamp; return d;
+    }
+    if (local.settings.embedSeen !== stamp){
+      const when = emb.exportedAt ? new Date(emb.exportedAt).toLocaleString('es-PA') : 'fecha desconocida';
+      const ok = confirm(`Este archivo trae datos exportados el ${when} (${emb.services.length} servicios).\n\nEste navegador ya tiene ${local.services.length} servicios guardados.\n\nAceptar: usar los datos del archivo (reemplaza los de este navegador).\nCancelar: conservar los datos de este navegador.`);
+      if (ok){ const d = normalize(emb); d.settings.embedSeen = stamp; return d; }
+      local.settings.embedSeen = stamp;
+    }
+  }
+  return local || normalize({});
+}
+let S = load();
+function save(){
+  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); }
+  catch(e){ toast('⚠ No se pudo guardar en este navegador. Exporta un respaldo.'); }
+}
+
+/* ================= Utilidades ================= */
+const $ = s => document.querySelector(s);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const pad = n => String(n).padStart(2,'0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+const today = () => ymd(new Date());
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const fmtDate = s => { if(!s) return ''; const [y,m,d] = s.split('-'); return d + '/' + m + '/' + y; };
+const daysBetween = (a,b) => Math.round((parse(b) - parse(a)) / 86400000);
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+const money = n => '$' + (Math.round(num(n)*100)/100).toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const provName = id => (S.providers.find(p => p.id === id) || {}).name || '—';
+const tourName = id => (S.tours.find(t => t.id === id) || {}).name || '—';
+const isMobile = () => window.matchMedia('(max-width:700px)').matches;
+function longDate(s){ const d = parse(s); return DIAS_L[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()].toLowerCase(); }
+function inMonth(s, y, m){ const [yy, mm] = s.date.split('-').map(Number); return yy === y && mm - 1 === m; }
+function svcsOn(ds){ return S.services.filter(s => s.date === ds).sort((a,b) => (a.time||'').localeCompare(b.time||'')); }
+
+/* ================= Cálculos ================= */
+function due(s){ return s.status === 'cancelado' ? num(s.cancelFee) : num(s.rate); }
+function isEarned(s){ return s.status === 'realizado' || (s.status === 'cancelado' && num(s.cancelFee) > 0); }
+function paid(s){
+  if (s.payStatus === 'pagado') return due(s);
+  if (s.payStatus === 'parcial') return Math.min(num(s.paidAmount), due(s));
+  return 0;
+}
+function netv(s){ return due(s) - num(s.expenses); }
+function pending(s){ return Math.max(due(s) - paid(s), 0); }
+function colorKey(s){
+  if (s.status === 'cancelado') return 'cancelado';
+  if (s.status === 'programado') return 'programado';
+  return s.payStatus;
+}
+/* Clase extra que acompaña al color base (ver .pp / .owe) */
+function xc(s){
+  if (s.status === 'programado' && s.payStatus !== 'pendiente' && paid(s) > 0) return ' pp';
+  if (s.status === 'cancelado' && num(s.cancelFee) > 0 && pending(s) > 0) return ' owe';
+  return '';
+}
+function kpis(list){
+  const k = {net:0, gross:0, exp:0, cob:0, pend:0, tips:0, prog:0, progN:0, adv:0, n:0, real:0};
+  for (const s of list){
+    if (isEarned(s)){ k.n++; k.gross += due(s); k.exp += num(s.expenses); k.net += netv(s); k.cob += paid(s); k.pend += pending(s); }
+    if (s.status === 'realizado'){ k.tips += num(s.tip); k.real++; }
+    // Programado: solo lo que falta cobrar; lo pagado por adelantado va como anticipo
+    if (s.status === 'programado'){ k.prog += pending(s); k.adv += paid(s); k.progN++; }
+  }
+  return k;
+}
+function findRate(provId, tourId, pax){
+  const r = S.rates.find(x => x.providerId === provId && x.tourId === tourId);
+  if (!r) return null;
+  for (const g of r.ranges){
+    const max = (g.max === '' || g.max == null) ? Infinity : num(g.max);
+    if (pax >= num(g.min) && pax <= max && g.rate !== '') return {rate:num(g.rate), g};
+  }
+  return null;
+}
+const rangeLabel = g => (g.max === '' || g.max == null) ? (num(g.min) + '+') : (num(g.min) + '–' + num(g.max));
+
+/* ================= Estado UI ================= */
+const now = new Date();
+const ui = {
+  tab:'calendario', y:now.getFullYear(), m:now.getMonth(), view:'mes',
+  dY:now.getFullYear(), dM:now.getMonth(),
+  sv:{y:now.getFullYear(), m:now.getMonth(), prov:'', st:'', pay:''},
+  rateSel:{prov:'', tour:''},
+  dayOpen:null, rateTouched:false
+};
+
+/* ================= Render general ================= */
+function render(){
+  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === 'tab-' + ui.tab));
+  document.querySelectorAll('[data-act="tab"]').forEach(b => b.classList.toggle('on', b.dataset.tab === ui.tab));
+  ({calendario:renderCalendar, dashboard:renderDashboard, servicios:renderServices, tarifas:renderTarifas, proveedores:renderProveedores})[ui.tab]();
+}
+function refresh(){ render(); if (ui.dayOpen) openDay(ui.dayOpen); }
+
+function kpiCards(k){
+  const pct = k.gross > 0 ? Math.round(k.cob / k.gross * 100) : 0;
+  return `<div class="kpis">
+    <div class="kpi k-net"><div class="l">Ingreso neto</div><div class="v">${money(k.net)}</div><div class="s">Bruto ${money(k.gross)} · Gastos ${money(k.exp)}</div></div>
+    <div class="kpi"><div class="l">Cobrado</div><div class="v">${money(k.cob)}</div><div class="s">${pct}% del bruto${k.adv > 0 ? ` · Anticipos ${money(k.adv)}` : ''}</div></div>
+    <div class="kpi k-pend"><div class="l">Por cobrar</div><div class="v">${money(k.pend)}</div><div class="s">Programado: ${money(k.prog)} (${k.progN})</div></div>
+    <div class="kpi k-tip"><div class="l">Propinas</div><div class="v">${money(k.tips)}</div><div class="s">${k.real} servicio${k.real===1?'':'s'} realizado${k.real===1?'':'s'}</div></div>
+  </div>`;
+}
+function legend(){
+  return `<div class="legend">
+    <span><i class="sw st-programado"></i>Programado</span>
+    <span><i class="sw st-pendiente"></i>Realizado sin pagar</span>
+    <span><i class="sw st-parcial"></i>Pago parcial</span>
+    <span><i class="sw st-pagado"></i>Pagado</span>
+    <span><i class="sw st-cancelado"></i>Cancelado</span>
+    <span><i class="sw st-programado pp"></i>Programado con anticipo</span>
+    <span><i class="sw st-cancelado owe"></i>Penalidad por cobrar</span>
+  </div>`;
+}
+function badges(s){
+  return `<span class="badge b-${s.status}">${ST_LABEL[s.status]}</span>` +
+    (s.status === 'cancelado' && !num(s.cancelFee) ? '' : `<span class="badge p-${s.payStatus}">${PAY_LABEL[s.payStatus]}</span>`);
+}
+function quickActions(s){
+  let h = '';
+  if (s.status === 'programado') h += `<button class="qa done" data-act="done" data-id="${s.id}" title="Marcar realizado">✓</button>`;
+  if (s.payStatus !== 'pagado' && due(s) > 0 && (s.status !== 'cancelado' || num(s.cancelFee) > 0))
+    h += `<button class="qa pay" data-act="pay" data-id="${s.id}" title="Marcar pagado">$</button>`;
+  return h;
+}
+function svcRow(s, showDate){
+  const pend = isEarned(s) ? pending(s) : 0;
+  return `<div class="row" data-act="edit" data-id="${s.id}">
+    <span class="bar st-${colorKey(s)}${xc(s)}"></span>
+    <div class="row-main">
+      <div class="row-title">${s.time ? esc(s.time) + ' · ' : ''}${esc(provName(s.providerId))} — ${esc(tourName(s.tourId))}${s.groupId ? ` <span class="gtag">Día ${s.groupDay}/${s.groupTotal}</span>` : ''}</div>
+      <div class="row-sub">${showDate ? fmtDate(s.date) + ' · ' : ''}${num(s.pax)} pax ${badges(s)}</div>
+    </div>
+    <div class="row-amt">${money(due(s))}${pend > 0 && pend < due(s) ? `<small>Falta ${money(pend)}</small>` : ''}</div>
+    <div class="row-actions">${quickActions(s)}</div>
+  </div>`;
+}
+
+/* ================= Calendario ================= */
+function renderCalendar(){
+  const y = ui.y, m = ui.m;
+  const monthSvcs = S.services.filter(s => inMonth(s, y, m));
+  let h = `<div class="toolbar">
+    <div class="monthnav">
+      <button class="icon-btn" data-act="prev" aria-label="Mes anterior">‹</button>
+      <h2>${MESES[m]} ${y}</h2>
+      <button class="icon-btn" data-act="next" aria-label="Mes siguiente">›</button>
+      <button class="btn ghost sm" data-act="today">Hoy</button>
+    </div>
+    <div class="toolbar-r">
+      <div class="seg"><button class="${ui.view==='mes'?'on':''}" data-act="view" data-v="mes">Mes</button><button class="${ui.view==='agenda'?'on':''}" data-act="view" data-v="agenda">Agenda</button></div>
+      <button class="btn primary" data-act="new">+ Servicio</button>
+    </div>
+  </div>`;
+  h += kpiCards(kpis(monthSvcs));
+  h += legend();
+  h += ui.view === 'mes' ? monthGrid(y, m) : agendaList(monthSvcs);
+  $('#tab-calendario').innerHTML = h;
+}
+function monthGrid(y, m){
+  const first = new Date(y, m, 1), off = (first.getDay() + 6) % 7, dim = new Date(y, m+1, 0).getDate();
+  const total = Math.ceil((off + dim) / 7) * 7, t = today();
+  let h = '<div class="cal"><div class="cal-head">' + DIAS.map(d => `<div>${d}</div>`).join('') + '</div><div class="cal-grid">';
+  for (let i = 0; i < total; i++){
+    const dt = new Date(y, m, 1 - off + i), ds = ymd(dt), other = dt.getMonth() !== m;
+    const list = svcsOn(ds);
+    const chips = list.slice(0,3).map(s => {
+      const tip = `${s.time ? s.time + ' · ' : ''}${provName(s.providerId)} · ${tourName(s.tourId)}${grpTag(s)} · ${num(s.pax)} pax · ${money(due(s))} · ${ST_LABEL[s.status]}${s.status !== 'programado' ? ' / ' + PAY_LABEL[s.payStatus] : ''}`;
+      return `<div class="chip st-${colorKey(s)}${xc(s)}" data-act="edit" data-id="${s.id}" title="${esc(tip)}">${s.groupId ? `<b>D${s.groupDay}/${s.groupTotal}</b> ` : ''}${s.time ? `<b>${esc(s.time)}</b> ` : ''}${esc(provName(s.providerId))}</div>`;
+    }).join('');
+    const more = list.length > 3 ? `<div class="more" data-act="day" data-date="${ds}">+${list.length-3} más</div>` : '';
+    const dots = list.map(s => `<span class="dot st-${colorKey(s)}${xc(s)}"></span>`).join('');
+    h += `<div class="cell${other ? ' other' : ''}${ds === t ? ' today' : ''}" data-act="cell" data-date="${ds}">
+      <div class="dnum">${dt.getDate()}</div><div class="chips">${chips}${more}</div><div class="dots">${dots}</div></div>`;
+  }
+  return h + '</div></div>';
+}
+function agendaList(list){
+  if (!list.length) return `<div class="card empty"><b>Sin servicios este mes</b>Usa “+ Servicio” para registrar uno.</div>`;
+  const sorted = [...list].sort((a,b) => (a.date + (a.time||'')).localeCompare(b.date + (b.time||'')));
+  let h = '<div>', last = '';
+  for (const s of sorted){
+    if (s.date !== last){ h += `<div class="group-date">${longDate(s.date)}</div>`; last = s.date; }
+    h += svcRow(s);
+  }
+  return h + '</div>';
+}
+function openDay(ds){
+  ui.dayOpen = ds;
+  const list = svcsOn(ds);
+  openDrawer(`<div class="dr-head"><h3 style="text-transform:capitalize">${longDate(ds)}</h3><button class="icon-btn" data-act="close" aria-label="Cerrar">✕</button></div>
+    ${legend()}
+    ${list.length ? list.map(s => svcRow(s)).join('') : '<div class="empty"><b>Sin servicios</b>Este día está libre.</div>'}
+    <button class="btn primary" style="width:100%;margin-top:8px" data-act="new" data-date="${ds}">+ Agregar servicio</button>`);
+}
+
+/* ================= Formulario ================= */
+function provOptions(sel){
+  return `<option value="">Selecciona…</option>` + S.providers.map(p => `<option value="${p.id}"${p.id === sel ? ' selected' : ''}>${esc(p.name)}</option>`).join('') + `<option value="__new">＋ Agregar proveedor…</option>`;
+}
+function tourOptions(sel){
+  return `<option value="">Selecciona…</option>` + S.tours.map(t => `<option value="${t.id}"${t.id === sel ? ' selected' : ''}>${esc(t.name)}</option>`).join('') + `<option value="__new">＋ Agregar tour…</option>`;
+}
+function blankService(date){
+  return {id:null, date:date || today(), time:'', providerId:'', tourId:'', pax:1, rate:'', expenses:'', tip:'',
+    status:'programado', cancelFee:'', payStatus:'pendiente', paidAmount:'', paidDate:'', notes:''};
+}
+const DIAS_C = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const shortDate = s => { const d = parse(s); return DIAS_C[d.getDay()] + ' ' + pad(d.getDate()) + '/' + pad(d.getMonth()+1); };
+const grpTag = s => s.groupId ? ` · Día ${s.groupDay}/${s.groupTotal}` : '';
+const grpOf = gid => S.services.filter(x => x.groupId === gid).sort((a,b) => a.date.localeCompare(b.date));
+function dateRange(a, b){
+  const out = []; if (!a || !b) return out;
+  let d = parse(a); const end = parse(b);
+  while (d <= end && out.length < 32){ out.push(ymd(d)); d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1); }
+  return out;
+}
+function openForm(id, date, copyFrom){
+  ui.dayOpen = null;
+  let s;
+  if (copyFrom){ s = Object.assign({}, copyFrom, {id:null, status:'programado', payStatus:'pendiente', paidAmount:'', paidDate:'', cancelFee:'', tip:''}); delete s.groupId; delete s.groupDay; delete s.groupTotal; }
+  else s = id ? Object.assign({}, S.services.find(x => x.id === id)) : blankService(date);
+  ui.rateTouched = !!id || !!copyFrom;
+  const isNew = !id;
+  let grpBox = '';
+  if (s.groupId){
+    const g = grpOf(s.groupId);
+    const tot = g.reduce((a,x) => a + due(x), 0);
+    grpBox = `<div class="grpbox full"><div><b>Circuito · Día ${s.groupDay} de ${s.groupTotal}</b><br><span class="muted">${fmtDate(g[0].date)} – ${fmtDate(g[g.length-1].date)} · ${g.length} días · Total ${money(tot)}</span></div>
+      <div class="grp-actions"><button type="button" class="btn sm" data-act="grp-done" data-g="${s.groupId}">✓ Circuito realizado</button><button type="button" class="btn sm" data-act="grp-pay" data-g="${s.groupId}">$ Circuito pagado</button><button type="button" class="btn sm danger" data-act="grp-del" data-g="${s.groupId}">Eliminar circuito</button></div>
+      <div class="muted" style="font-size:12px">Los cambios de este formulario aplican solo a este día.</div></div>`;
+  }
+  const sel = (name, val, opts) => `<select name="${name}">${opts.map(([v,l]) => `<option value="${v}"${v === val ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
+  openDrawer(`<div class="dr-head"><h3>${id ? (s.groupId ? 'Editar día del circuito' : 'Editar servicio') : 'Nuevo servicio'}</h3><button class="icon-btn" data-act="close" aria-label="Cerrar">✕</button></div>
+  <form id="f" class="form" autocomplete="off" novalidate>
+    ${grpBox}
+    <label>${isNew ? 'Fecha (inicio)' : 'Fecha'}<input type="date" name="date" value="${esc(s.date)}" required></label>
+    ${isNew ? `<label>Hasta (circuito) — opcional<input type="date" name="endDate" value=""></label>` : `<label>Hora<input type="time" name="time" value="${esc(s.time)}"></label>`}
+    ${isNew ? `<label>Hora<input type="time" name="time" value="${esc(s.time)}"></label>` : ''}
+    <label>Nº de pasajeros<input type="number" name="pax" min="1" step="1" value="${esc(s.pax)}"></label>
+    ${isNew ? '' : '<div></div>'}
+    <label class="full">Proveedor<select name="providerId">${provOptions(s.providerId)}</select></label>
+    <label class="full">Tour<select name="tourId">${tourOptions(s.tourId)}</select></label>
+    <div class="hint" id="rateHint"></div>
+    <label><span id="rateLbl">Tarifa ($)</span><input type="number" name="rate" min="0" step="0.01" value="${esc(s.rate)}" placeholder="0.00"></label>
+    <label>Gastos ($)<input type="number" name="expenses" min="0" step="0.01" value="${esc(s.expenses)}" placeholder="0.00"></label>
+    <label>Propina ($)<input type="number" name="tip" min="0" step="0.01" value="${esc(s.tip)}" placeholder="0.00"></label>
+    <div></div>
+    <div class="days hide" id="daysBox"></div>
+    <div class="sep">Estado</div>
+    <label>Servicio${sel('status', s.status, [['programado','Programado'],['realizado','Realizado'],['cancelado','Cancelado']])}</label>
+    <label>Pago${sel('payStatus', s.payStatus, [['pendiente','Pendiente'],['parcial','Parcial'],['pagado','Pagado']])}</label>
+    <label id="w-cancel" class="full">Monto por cancelación ($) — opcional<input type="number" name="cancelFee" min="0" step="0.01" value="${esc(s.cancelFee)}" placeholder="0.00"></label>
+    <label id="w-paidAmount">Monto cobrado ($)<input type="number" name="paidAmount" min="0" step="0.01" value="${esc(s.paidAmount)}" placeholder="0.00"></label>
+    <label id="w-paidDate">Fecha de cobro<input type="date" name="paidDate" value="${esc(s.paidDate)}"></label>
+    <label class="full">Notas<textarea name="notes" rows="2" placeholder="Punto de encuentro, idioma, cliente…">${esc(s.notes)}</textarea></label>
+    <div class="fsum" id="fsum"></div>
+    <div class="factions">
+      <div class="r">${id ? `<button type="button" class="btn danger" data-act="del" data-id="${id}">${s.groupId ? 'Eliminar este día' : 'Eliminar'}</button><button type="button" class="btn" data-act="dup" data-id="${id}">Duplicar</button>` : ''}</div>
+      <div class="r"><button type="button" class="btn" data-act="close">Cancelar</button><button type="submit" class="btn primary">Guardar</button></div>
+    </div>
+  </form>`);
+  bindForm(s.id);
+}
+function bindForm(id){
+  const f = $('#f'), F = n => f.elements[n];
+  let days = []; // [{date, rate, touched}]
+  const getObj = () => ({
+    date:F('date').value, time:F('time').value, providerId:F('providerId').value, tourId:F('tourId').value,
+    pax:Math.max(1, parseInt(F('pax').value) || 1), rate:F('rate').value, expenses:F('expenses').value, tip:F('tip').value,
+    status:F('status').value, cancelFee:F('cancelFee').value, payStatus:F('payStatus').value,
+    paidAmount:F('paidAmount').value, paidDate:F('paidDate').value, notes:F('notes').value.trim()
+  });
+  const isCircuit = () => days.length > 1;
+  const toggles = () => {
+    const st = F('status').value, pay = F('payStatus').value;
+    $('#w-cancel').classList.toggle('hide', st !== 'cancelado' || isCircuit());
+    $('#w-paidAmount').classList.toggle('hide', pay !== 'parcial');
+    $('#w-paidDate').classList.toggle('hide', pay === 'pendiente');
+  };
+  const summary = () => {
+    const o = getObj();
+    if (isCircuit()){
+      const tot = days.reduce((a,d) => a + num(d.rate), 0);
+      $('#fsum').innerHTML = `<span>Circuito: <b>${days.length} días</b></span><span>Total tarifas: <b>${money(tot)}</b></span><span>Neto: <b>${money(tot - num(o.expenses))}</b></span>`;
+      return;
+    }
+    const e = isEarned(o);
+    $('#fsum').innerHTML = `<span>Neto: <b>${money(netv(o))}</b></span><span>Cobrado: <b>${money(paid(o))}</b></span><span>Por cobrar: <b>${money(e || o.status === 'programado' ? pending(o) : 0)}</b></span>`;
+  };
+  const renderDays = () => {
+    const box = $('#daysBox');
+    box.classList.toggle('hide', !isCircuit());
+    $('#rateLbl').textContent = isCircuit() ? 'Tarifa por día ($)' : 'Tarifa ($)';
+    toggles();
+    if (!isCircuit()){ box.innerHTML = ''; summary(); return; }
+    const tot = days.reduce((a,d) => a + num(d.rate), 0);
+    box.innerHTML = `<div class="days-h"><b>Circuito de ${days.length} días</b><span>Total ${money(tot)}</span></div>
+      ${days.map((d,i) => `<div class="dayrow${d.touched ? ' mod' : ''}"><span class="dlab">Día ${i+1} · ${shortDate(d.date)}</span>
+        <input type="number" min="0" step="0.01" value="${esc(d.rate)}" placeholder="0.00" data-day="${i}" aria-label="Tarifa día ${i+1}">
+        <button type="button" class="icon-btn" data-dayreset="${i}" title="Volver a la tarifa base"${d.touched ? '' : ' style="visibility:hidden"'}>↺</button></div>`).join('')}
+      <p class="muted" style="margin:6px 0 0">Cambia la tarifa del día que varíe. Gastos y propina se guardan en el día 1; después puedes ajustarlos en cada día.</p>`;
+    summary();
+  };
+  const syncDays = () => {
+    if (!F('endDate')) return;
+    const a = F('date').value, b = F('endDate').value;
+    if (b && a && b < a){ toast('La fecha final es anterior a la de inicio'); days = []; renderDays(); return; }
+    const list = (a && b && b > a) ? dateRange(a, b) : [];
+    if (list.length >= 32){ toast('Máximo 31 días por circuito'); }
+    const prev = Object.fromEntries(days.filter(d => d.touched).map(d => [d.date, d.rate]));
+    days = list.slice(0,31).map(ds => prev[ds] != null ? {date:ds, rate:prev[ds], touched:true} : {date:ds, rate:F('rate').value, touched:false});
+    renderDays();
+  };
+  const baseToDays = () => { days.forEach(d => { if (!d.touched) d.rate = F('rate').value; }); renderDays(); };
+  const suggest = () => {
+    const p = F('providerId').value, t = F('tourId').value, pax = parseInt(F('pax').value) || 1, hint = $('#rateHint');
+    hint.className = 'hint';
+    if (!p || !t || p === '__new' || t === '__new'){ hint.innerHTML = ''; baseToDays(); return; }
+    const r = findRate(p, t, pax);
+    if (r){
+      if (!ui.rateTouched) F('rate').value = r.rate;
+      hint.innerHTML = `<span>Tarifa sugerida: <b>${money(r.rate)}</b> (rango ${rangeLabel(r.g)} pax)</span>` +
+        (num(F('rate').value) !== r.rate ? `<a data-act="apply-rate" data-v="${r.rate}">Aplicar</a>` : '');
+    } else {
+      hint.classList.add('no');
+      hint.innerHTML = `<span>No hay tarifa para ${pax} pax con este proveedor y tour.</span><a data-act="goto-rates" data-p="${p}" data-t="${t}">Configurar</a>`;
+    }
+    baseToDays();
+  };
+  F('providerId').addEventListener('change', () => {
+    if (F('providerId').value === '__new'){
+      const n = prompt('Nombre del nuevo proveedor:');
+      if (n && n.trim()){ const p = addProvider(n.trim()); F('providerId').innerHTML = provOptions(p ? p.id : ''); }
+      else F('providerId').value = '';
+    }
+    ui.rateTouched = false; suggest();
+  });
+  F('tourId').addEventListener('change', () => {
+    if (F('tourId').value === '__new'){
+      const n = prompt('Nombre del nuevo tour:');
+      if (n && n.trim()){ const t = addTour(n.trim()); F('tourId').innerHTML = tourOptions(t ? t.id : ''); }
+      else F('tourId').value = '';
+    }
+    ui.rateTouched = false; suggest();
+  });
+  F('pax').addEventListener('input', () => { ui.rateTouched = false; suggest(); });
+  F('rate').addEventListener('input', () => { ui.rateTouched = true; suggest(); });
+  if (F('endDate')){
+    F('date').addEventListener('change', syncDays);
+    F('endDate').addEventListener('change', syncDays);
+  }
+  $('#daysBox').addEventListener('input', e => {
+    const i = e.target.dataset.day; if (i == null) return;
+    days[+i].rate = e.target.value; days[+i].touched = true;
+    e.target.closest('.dayrow').classList.add('mod');
+    e.target.parentNode.querySelector('[data-dayreset]').style.visibility = '';
+    const tot = days.reduce((a,d) => a + num(d.rate), 0);
+    $('#daysBox .days-h span').textContent = 'Total ' + money(tot);
+    summary();
+  });
+  $('#daysBox').addEventListener('click', e => {
+    const b = e.target.closest('[data-dayreset]'); if (!b) return;
+    const d = days[+b.dataset.dayreset]; d.rate = F('rate').value; d.touched = false; renderDays();
+  });
+  ['expenses','tip','cancelFee','paidAmount'].forEach(n => F(n).addEventListener('input', summary));
+  F('status').addEventListener('change', () => { toggles(); summary(); });
+  F('payStatus').addEventListener('change', () => {
+    if (F('payStatus').value !== 'pendiente' && !F('paidDate').value) F('paidDate').value = today();
+    toggles(); summary();
+  });
+  f.addEventListener('submit', e => {
+    e.preventDefault();
+    const o = getObj();
+    if (!o.date) return toast('Indica la fecha del servicio');
+    if (!o.providerId || o.providerId === '__new') return toast('Selecciona un proveedor');
+    if (!o.tourId || o.tourId === '__new') return toast('Selecciona un tour');
+    if (F('endDate') && F('endDate').value && F('endDate').value < o.date) return toast('La fecha final es anterior a la de inicio');
+    if (o.payStatus === 'parcial' && !(num(o.paidAmount) > 0)) return toast('Indica el monto cobrado del pago parcial');
+    if (!id && isCircuit()){
+      if (o.status !== 'cancelado' && days.some(d => !(num(d.rate) > 0)) && !confirm('Hay días del circuito sin tarifa ($0). ¿Guardar así?')) return;
+      const gid = uid(), n = days.length;
+      let left = num(o.paidAmount);
+      days.forEach((d, i) => {
+        const s = Object.assign({id:uid()}, o, {date:d.date, rate:String(d.rate), expenses:i === 0 ? o.expenses : '', tip:i === 0 ? o.tip : '',
+          cancelFee:'', groupId:gid, groupDay:i + 1, groupTotal:n});
+        if (o.status === 'cancelado') s.status = 'cancelado';
+        if (o.payStatus === 'pagado') s.paidAmount = String(num(d.rate));
+        else if (o.payStatus === 'parcial'){
+          const take = Math.min(left, num(d.rate)); left -= take;
+          if (take <= 0){ s.payStatus = 'pendiente'; s.paidAmount = ''; s.paidDate = ''; }
+          else if (take >= num(d.rate)){ s.payStatus = 'pagado'; s.paidAmount = String(num(d.rate)); }
+          else { s.paidAmount = String(take); }
+        } else { s.paidAmount = ''; s.paidDate = ''; }
+        S.services.push(s);
+      });
+      save(); closeDrawer(); render(); toast(`Circuito registrado · ${n} días`);
+      return;
+    }
+    if (o.status !== 'cancelado' && !(num(o.rate) > 0) && !confirm('Este servicio no tiene tarifa ($0). ¿Guardar así?')) return;
+    if (o.status !== 'cancelado') o.cancelFee = '';
+    // Un "parcial" que cubre todo lo adeudado es en realidad un pago completo
+    let autoPaid = false;
+    if (o.payStatus === 'parcial' && due(o) > 0 && num(o.paidAmount) >= due(o)){ o.payStatus = 'pagado'; autoPaid = true; }
+    if (o.payStatus === 'pagado') o.paidAmount = String(due(o));
+    if (o.payStatus === 'pendiente'){ o.paidAmount = ''; o.paidDate = ''; }
+    if (id){
+      const i = S.services.findIndex(x => x.id === id); S.services[i] = Object.assign({}, S.services[i], o, {id});
+      // Si cambió la fecha de un día del circuito, renumerar los días por fecha
+      const gid = S.services[i].groupId;
+      if (gid) grpOf(gid).forEach((x, k) => { x.groupDay = k + 1; });
+    }
+    else S.services.push(Object.assign({id:uid()}, o));
+    save(); closeDrawer(); render();
+    const msg = id ? (S.services.find(x => x.id === id).groupId ? 'Día del circuito actualizado' : 'Servicio actualizado') : 'Servicio registrado';
+    toast(autoPaid ? msg + ' · el monto cubre todo, quedó como Pagado' : msg);
+  });
+  toggles(); suggest();
+}
+
+/* ================= Acciones de servicio ================= */
+function markDone(id){
+  const s = S.services.find(x => x.id === id); if (!s) return;
+  s.status = 'realizado'; save(); refresh(); toast('Marcado como realizado');
+}
+function markPaid(id){
+  const s = S.services.find(x => x.id === id); if (!s) return;
+  s.payStatus = 'pagado'; s.paidAmount = String(due(s)); if (!s.paidDate) s.paidDate = today();
+  save(); refresh(); toast('Pago confirmado · ' + money(due(s)));
+}
+function delService(id){
+  const s = S.services.find(x => x.id === id);
+  if (!confirm(s && s.groupId ? `¿Eliminar solo el día ${s.groupDay} del circuito? No se puede deshacer.` : '¿Eliminar este servicio? No se puede deshacer.')) return;
+  S.services = S.services.filter(x => x.id !== id);
+  if (s && s.groupId){
+    const rest = grpOf(s.groupId);
+    rest.forEach((x, i) => { x.groupDay = i + 1; x.groupTotal = rest.length; if (rest.length === 1){ delete x.groupId; delete x.groupDay; delete x.groupTotal; } });
+  }
+  save(); closeDrawer(); render(); toast(s && s.groupId ? 'Día eliminado del circuito' : 'Servicio eliminado');
+}
+function grpDone(gid){
+  grpOf(gid).forEach(x => { if (x.status === 'programado') x.status = 'realizado'; });
+  save(); closeDrawer(); render(); toast('Circuito marcado como realizado');
+}
+function grpPay(gid){
+  const g = grpOf(gid); let tot = 0;
+  g.forEach(x => { if (x.status === 'cancelado' && !num(x.cancelFee)) return; x.payStatus = 'pagado'; x.paidAmount = String(due(x)); if (!x.paidDate) x.paidDate = today(); tot += due(x); });
+  save(); closeDrawer(); render(); toast('Circuito pagado · ' + money(tot));
+}
+function grpDel(gid){
+  const g = grpOf(gid);
+  if (!confirm(`¿Eliminar el circuito completo (${g.length} días)? No se puede deshacer.`)) return;
+  S.services = S.services.filter(x => x.groupId !== gid); save(); closeDrawer(); render(); toast('Circuito eliminado');
+}
+
+/* ================= Dashboard ================= */
+function yearsList(extra){
+  const ys = new Set([now.getFullYear()]);
+  S.services.forEach(s => ys.add(+s.date.slice(0,4)));
+  if (extra) ys.add(extra);
+  return [...ys].sort((a,b) => b - a);
+}
+function renderDashboard(){
+  const list = S.services.filter(s => { const [yy,mm] = s.date.split('-').map(Number); return yy === ui.dY && (ui.dM === 'all' || mm - 1 === ui.dM); });
+  const k = kpis(list);
+  const periodo = ui.dM === 'all' ? `Año ${ui.dY}` : `${MESES[ui.dM]} ${ui.dY}`;
+  let h = `<div class="toolbar"><h2>Dashboard · ${periodo}</h2>
+    <div class="filters" style="margin:0">
+      <label>Año<select data-chg="dY">${yearsList(ui.dY).map(y => `<option${y === ui.dY ? ' selected' : ''}>${y}</option>`).join('')}</select></label>
+      <label>Mes<select data-chg="dM"><option value="all"${ui.dM === 'all' ? ' selected' : ''}>Todo el año</option>${MESES.map((n,i) => `<option value="${i}"${i === ui.dM ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+    </div></div>`;
+  h += kpiCards(k);
+
+  // Alertas (todas las fechas)
+  const ad = S.settings.alertDays, t = today();
+  const alerts = S.services.filter(s => isEarned(s) && pending(s) > 0 && daysBetween(s.date, t) > ad).sort((a,b) => a.date.localeCompare(b.date));
+  h += `<div class="card alert"><div class="alert-h"><h3>⚠ Cobros atrasados ${alerts.length ? `(${alerts.length} · ${money(alerts.reduce((a,s) => a + pending(s), 0))})` : ''}</h3>
+    <label class="inline-num">Avisar después de <input type="number" min="1" data-chg="alertDays" value="${ad}"> días</label></div>
+    ${alerts.length ? alerts.map(s => svcRow(s, true).replace('<div class="row-amt">', `<div class="row-amt"><small style="color:var(--muted)">hace ${daysBetween(s.date, t)} días</small>`)).join('') : `<div class="muted">Sin servicios realizados pendientes de pago por más de ${ad} días.</div>`}
+  </div>`;
+
+  // Gráfico 12 meses
+  const ey = ui.dY, em = ui.dM === 'all' ? 11 : ui.dM;
+  const data = [];
+  for (let i = 11; i >= 0; i--){
+    const d = new Date(ey, em - i, 1), y = d.getFullYear(), m = d.getMonth();
+    let c = 0, p = 0;
+    S.services.forEach(s => { if (inMonth(s, y, m) && isEarned(s)){ c += paid(s); p += pending(s); } });
+    data.push({y, m, c, p});
+  }
+  const max = Math.max(1, ...data.map(d => d.c + d.p));
+  const bars = data.map(d => {
+    const tot = d.c + d.p, sel = ui.dM !== 'all' && d.y === ui.dY && d.m === ui.dM;
+    return `<div class="bcol${sel ? ' sel' : ''}" title="${MESES[d.m]} ${d.y}\nCobrado: ${money(d.c)}\nPor cobrar: ${money(d.p)}">
+      <div class="btrack"><div class="bwrap" style="height:${tot / max * 100}%">
+        <span class="bval">${tot > 0 ? '$' + Math.round(tot).toLocaleString('en-US') : ''}</span>
+        <div class="bstack"><div class="bp" style="flex:${d.p}"></div><div class="bc" style="flex:${d.c}"></div></div>
+      </div></div>
+      <span class="blab">${MES_C[d.m]}</span></div>`;
+  }).join('');
+
+  // Ranking
+  const by = {};
+  for (const s of list){
+    if (!isEarned(s)) continue;
+    const r = by[s.providerId] || (by[s.providerId] = {id:s.providerId, n:0, net:0, pend:0, tips:0, days:[]});
+    r.n++; r.net += netv(s); r.pend += pending(s);
+    if (s.status === 'realizado') r.tips += num(s.tip);
+    if (s.payStatus === 'pagado' && s.paidDate) r.days.push(Math.max(0, daysBetween(s.date, s.paidDate)));
+  }
+  const rows = Object.values(by).sort((a,b) => b.net - a.net);
+  const rmax = Math.max(1, ...rows.map(r => r.net));
+  const hbars = rows.length ? rows.map((r,i) => `<div class="hbar"><span class="rank">${i+1}</span><span class="hname" title="${esc(provName(r.id))}">${esc(provName(r.id))}</span>
+      <div class="htrack"><div class="hfill" style="width:${Math.max(0, r.net) / rmax * 100}%"></div></div><span class="hval">${money(r.net)}</span></div>`).join('')
+    : '<div class="empty"><b>Sin ingresos en este periodo</b>Aparecerán al marcar servicios como realizados.</div>';
+
+  h += `<div class="dash-grid">
+    <div class="card"><h3>Ingresos por mes</h3><div class="bars">${bars}</div>
+      <div class="chart-legend"><span><i class="sw" style="background:var(--st-pag)"></i> Cobrado</span><span><i class="sw" style="background:var(--st-pend)"></i> Por cobrar</span></div></div>
+    <div class="card"><h3>Ranking de proveedores</h3>${hbars}</div>
+  </div>`;
+
+  h += `<div class="card"><h3>Detalle por proveedor · ${periodo}</h3>${rows.length ? `<div class="tbl-wrap"><table class="resp"><thead><tr>
+      <th>#</th><th>Proveedor</th><th class="n">Servicios</th><th class="n">Ingreso neto</th><th class="n">Promedio</th><th class="n">Por cobrar</th><th class="n">Días prom. pago</th><th class="n">Propinas</th></tr></thead><tbody>
+      ${rows.map((r,i) => `<tr><td data-label="#">${i+1}</td><td data-label="Proveedor"><b>${esc(provName(r.id))}</b></td><td class="n" data-label="Servicios">${r.n}</td>
+        <td class="n" data-label="Ingreso neto"><b>${money(r.net)}</b></td><td class="n" data-label="Promedio">${money(r.net / r.n)}</td>
+        <td class="n" data-label="Por cobrar" style="${r.pend > 0 ? 'color:var(--st-pend)' : ''}">${money(r.pend)}</td>
+        <td class="n" data-label="Días prom. pago">${r.days.length ? Math.round(r.days.reduce((a,b) => a + b, 0) / r.days.length) + ' días' : '—'}</td>
+        <td class="n" data-label="Propinas">${money(r.tips)}</td></tr>`).join('')}
+      </tbody></table></div><p class="muted">El ranking ordena por ingreso neto (tarifa − gastos). Las propinas se muestran solo como referencia.</p>` : '<div class="muted">Sin datos para este periodo.</div>'}</div>`;
+  $('#tab-dashboard').innerHTML = h;
+}
+
+/* ================= Servicios (lista) ================= */
+function renderServices(){
+  const f = ui.sv;
+  const list = S.services.filter(s => {
+    const [yy,mm] = s.date.split('-').map(Number);
+    if (f.y !== 'all' && yy !== f.y) return false;
+    if (f.m !== 'all' && mm - 1 !== f.m) return false;
+    if (f.prov && s.providerId !== f.prov) return false;
+    if (f.st && s.status !== f.st) return false;
+    if (f.pay && s.payStatus !== f.pay) return false;
+    return true;
+  }).sort((a,b) => (b.date + (b.time||'')).localeCompare(a.date + (a.time||'')));
+  const k = kpis(list);
+  let h = `<div class="toolbar"><h2>Servicios</h2><button class="btn primary" data-act="new">+ Servicio</button></div>
+  <div class="filters">
+    <label>Año<select data-chg="sv" data-k="y"><option value="all"${f.y === 'all' ? ' selected' : ''}>Todos</option>${yearsList(f.y === 'all' ? null : f.y).map(y => `<option${y === f.y ? ' selected' : ''}>${y}</option>`).join('')}</select></label>
+    <label>Mes<select data-chg="sv" data-k="m"><option value="all"${f.m === 'all' ? ' selected' : ''}>Todos</option>${MESES.map((n,i) => `<option value="${i}"${i === f.m ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+    <label>Proveedor<select data-chg="sv" data-k="prov"><option value="">Todos</option>${S.providers.map(p => `<option value="${p.id}"${p.id === f.prov ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
+    <label>Servicio<select data-chg="sv" data-k="st"><option value="">Todos</option>${Object.entries(ST_LABEL).map(([v,l]) => `<option value="${v}"${v === f.st ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+    <label>Pago<select data-chg="sv" data-k="pay"><option value="">Todos</option>${Object.entries(PAY_LABEL).map(([v,l]) => `<option value="${v}"${v === f.pay ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+  </div>`;
+  if (!list.length){ h += `<div class="card empty"><b>No hay servicios con estos filtros</b>Cambia los filtros o registra un servicio nuevo.</div>`; $('#tab-servicios').innerHTML = h; return; }
+  h += `<div class="card"><div class="tbl-wrap"><table class="resp"><thead><tr>
+    <th>Fecha</th><th>Hora</th><th>Proveedor</th><th>Tour</th><th class="n">Pax</th><th class="n">Tarifa</th><th class="n">Gastos</th><th class="n">Propina</th><th class="n">Neto</th><th>Estado</th><th></th></tr></thead><tbody>
+    ${list.map(s => `<tr class="click" data-act="edit" data-id="${s.id}">
+      <td data-label="Fecha"><span class="sw st-${colorKey(s)}${xc(s)}" style="margin-right:6px;vertical-align:-1px"></span>${fmtDate(s.date)}</td>
+      <td data-label="Hora">${esc(s.time) || '—'}</td>
+      <td data-label="Proveedor">${esc(provName(s.providerId))}</td>
+      <td data-label="Tour">${esc(tourName(s.tourId))}${s.groupId ? ` <span class="gtag">Día ${s.groupDay}/${s.groupTotal}</span>` : ''}</td>
+      <td class="n" data-label="Pax">${num(s.pax)}</td>
+      <td class="n" data-label="${s.status === 'cancelado' ? 'Penalidad' : 'Tarifa'}">${money(due(s))}</td>
+      <td class="n" data-label="Gastos">${money(s.expenses)}</td>
+      <td class="n" data-label="Propina">${money(s.tip)}</td>
+      <td class="n" data-label="Neto"><b>${isEarned(s) ? money(netv(s)) : '—'}</b></td>
+      <td data-label="Estado">${badges(s)}</td>
+      <td data-label="Acciones"><div class="row-actions" style="justify-content:flex-end">${quickActions(s)}</div></td>
+    </tr>`).join('')}
+    </tbody><tfoot><tr><td colspan="8" data-label="Totales">Totales (${list.length} servicios)</td><td class="n" data-label="Ingreso neto">${money(k.net)}</td><td colspan="2" data-label="Por cobrar / Propinas">Por cobrar ${money(k.pend)} · Propinas ${money(k.tips)}</td></tr></tfoot>
+  </table></div></div>`;
+  $('#tab-servicios').innerHTML = h;
+}
+
+/* ================= Tarifas ================= */
+function getRateEntry(create){
+  const {prov, tour} = ui.rateSel;
+  let r = S.rates.find(x => x.providerId === prov && x.tourId === tour);
+  if (!r && create){ r = {id:uid(), providerId:prov, tourId:tour, ranges:[]}; S.rates.push(r); }
+  return r;
+}
+function rangeWarnings(r){
+  if (!r || !r.ranges.length) return '';
+  const rs = r.ranges.filter(g => g.min !== '').map(g => ({min:num(g.min), max:(g.max === '' || g.max == null) ? Infinity : num(g.max)})).sort((a,b) => a.min - b.min);
+  const w = [];
+  if (rs.some(g => g.max < g.min)) w.push('Hay un rango donde “Hasta” es menor que “Desde”.');
+  for (let i = 1; i < rs.length; i++){
+    if (rs[i].min <= rs[i-1].max) { w.push('Hay rangos que se solapan.'); break; }
+    if (rs[i].min > rs[i-1].max + 1) { w.push(`Hay un hueco entre ${rs[i-1].max} y ${rs[i].min} pax.`); break; }
+  }
+  if (rs.length && rs[0].min > 1) w.push(`No hay tarifa para menos de ${rs[0].min} pax.`);
+  return w.length ? '⚠ ' + w.join(' ') : '';
+}
+function renderTarifas(){
+  const el = $('#tab-tarifas');
+  if (!S.providers.length || !S.tours.length){
+    el.innerHTML = `<div class="toolbar"><h2>Matriz de tarifas</h2></div><div class="card empty"><b>Primero agrega proveedores y tours</b>
+      La matriz se arma por proveedor × tour × rango de pasajeros.<br><br><button class="btn primary" data-act="tab" data-tab="proveedores">Ir a Proveedores y tours</button></div>`;
+    return;
+  }
+  if (!S.providers.some(p => p.id === ui.rateSel.prov)) ui.rateSel.prov = S.providers[0].id;
+  if (!S.tours.some(t => t.id === ui.rateSel.tour)) ui.rateSel.tour = S.tours[0].id;
+  const r = getRateEntry(false), ranges = r ? r.ranges : [];
+  el.innerHTML = `<div class="toolbar"><h2>Matriz de tarifas</h2></div>
+  <div class="card">
+    <div class="filters">
+      <label>Proveedor<select data-chg="rateProv">${S.providers.map(p => `<option value="${p.id}"${p.id === ui.rateSel.prov ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
+      <label>Tour<select data-chg="rateTour">${S.tours.map(t => `<option value="${t.id}"${t.id === ui.rateSel.tour ? ' selected' : ''}>${esc(t.name)}</option>`).join('')}</select></label>
+    </div>
+    <table class="rg-table"><thead><tr><th>Desde (pax)</th><th>Hasta (pax)</th><th>Tarifa ($)</th><th></th></tr></thead><tbody>
+      ${ranges.map((g,i) => `<tr>
+        <td><input type="number" min="1" step="1" value="${esc(g.min)}" data-chg="rg" data-i="${i}" data-f="min"></td>
+        <td><input type="number" min="1" step="1" value="${esc(g.max)}" placeholder="en adelante" data-chg="rg" data-i="${i}" data-f="max"></td>
+        <td><input type="number" min="0" step="0.01" value="${esc(g.rate)}" placeholder="0.00" data-chg="rg" data-i="${i}" data-f="rate"></td>
+        <td><button class="icon-btn" data-act="rg-del" data-i="${i}" title="Quitar rango">✕</button></td></tr>`).join('') || `<tr><td colspan="4" class="muted">Sin rangos para esta combinación.</td></tr>`}
+    </tbody></table>
+    <div class="warn" id="rgWarn">${rangeWarnings(r)}</div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="rg-add">+ Agregar rango</button></div>
+    <p class="muted">Deja “Hasta” vacío para el último rango (ej. 11 en adelante). Los cambios se guardan solos.</p>
+  </div>
+  <div class="card" id="rateOverview">${rateOverview()}</div>`;
+}
+function rateOverview(){
+  const list = S.rates.filter(r => r.ranges.length).sort((a,b) => (provName(a.providerId) + tourName(a.tourId)).localeCompare(provName(b.providerId) + tourName(b.tourId)));
+  if (!list.length) return `<h3>Todas las tarifas</h3><div class="muted">Aún no has configurado tarifas.</div>`;
+  return `<h3>Todas las tarifas</h3><div class="tbl-wrap"><table class="resp"><thead><tr><th>Proveedor</th><th>Tour</th><th>Rangos</th><th></th></tr></thead><tbody>
+    ${list.map(r => `<tr><td data-label="Proveedor"><b>${esc(provName(r.providerId))}</b></td><td data-label="Tour">${esc(tourName(r.tourId))}</td>
+      <td data-label="Rangos">${[...r.ranges].sort((a,b) => num(a.min) - num(b.min)).map(g => `${rangeLabel(g)} pax: <b>${money(g.rate)}</b>`).join(' · ')}</td>
+      <td data-label="Acciones"><div class="row-actions" style="justify-content:flex-end"><button class="btn sm" data-act="rate-edit" data-p="${r.providerId}" data-t="${r.tourId}">Editar</button><button class="btn sm danger" data-act="rate-del" data-id="${r.id}">Eliminar</button></div></td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+/* ================= Proveedores y tours ================= */
+function addProvider(name){
+  if (S.providers.some(p => p.name.toLowerCase() === name.toLowerCase())){ toast('Ese proveedor ya existe'); return S.providers.find(p => p.name.toLowerCase() === name.toLowerCase()); }
+  const p = {id:uid(), name}; S.providers.push(p); save(); return p;
+}
+function addTour(name){
+  if (S.tours.some(t => t.name.toLowerCase() === name.toLowerCase())){ toast('Ese tour ya existe'); return S.tours.find(t => t.name.toLowerCase() === name.toLowerCase()); }
+  const t = {id:uid(), name}; S.tours.push(t); save(); return t;
+}
+function renderProveedores(){
+  const used = (key, id) => S.services.filter(s => s[key] === id).length;
+  const item = (x, kind) => {
+    const n = used(kind === 'prov' ? 'providerId' : 'tourId', x.id);
+    return `<li><input type="text" value="${esc(x.name)}" data-chg="${kind}-name" data-id="${x.id}"><span class="muted" style="white-space:nowrap">${n} serv.</span>
+      <button class="icon-btn" data-act="${kind}-del" data-id="${x.id}" title="Eliminar">✕</button></li>`;
+  };
+  const le = S.settings.lastExport;
+  $('#tab-proveedores').innerHTML = `<div class="toolbar"><h2>Proveedores y tours</h2></div>
+  <div class="two">
+    <div class="card"><h3>Proveedores</h3>
+      <ul class="plist">${S.providers.map(p => item(p,'prov')).join('') || '<li class="muted">Aún no hay proveedores.</li>'}</ul>
+      <div class="addline"><input type="text" id="newProv" placeholder="Nombre del proveedor"><button class="btn primary" data-act="prov-add">Agregar</button></div>
+    </div>
+    <div class="card"><h3>Tours</h3>
+      <ul class="plist">${S.tours.map(t => item(t,'tour')).join('') || '<li class="muted">Aún no hay tours.</li>'}</ul>
+      <div class="addline"><input type="text" id="newTour" placeholder="Nombre del tour"><button class="btn primary" data-act="tour-add">Agregar</button></div>
+    </div>
+  </div>
+  <div class="card"><h3>Respaldo de datos</h3>
+    <p class="muted" style="margin-top:0">Los datos se guardan en este navegador. <b>Exportar a otra PC</b> descarga una copia de la app con todos tus datos dentro: cópiala a la otra PC (USB, correo, Drive) y ábrela; los datos se cargan solos. El respaldo JSON sirve para importarlo en una app que ya tengas abierta.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-act="export-app">⇪ Exportar a otra PC</button><button class="btn" data-act="export">⇩ Descargar respaldo JSON</button><button class="btn" data-act="import">⇧ Importar respaldo</button></div>
+    <p class="muted">Último respaldo: ${le ? fmtDate(le) : 'nunca'} · ${S.services.length} servicios registrados</p>
+  </div>`;
+}
+function delProvider(id){
+  if (S.services.some(s => s.providerId === id)) return toast('No se puede eliminar: tiene servicios registrados');
+  if (!confirm('¿Eliminar este proveedor y sus tarifas?')) return;
+  S.providers = S.providers.filter(p => p.id !== id); S.rates = S.rates.filter(r => r.providerId !== id); save(); render();
+}
+function delTour(id){
+  if (S.services.some(s => s.tourId === id)) return toast('No se puede eliminar: tiene servicios registrados');
+  if (!confirm('¿Eliminar este tour y sus tarifas?')) return;
+  S.tours = S.tours.filter(t => t.id !== id); S.rates = S.rates.filter(r => r.tourId !== id); save(); render();
+}
+
+/* ================= Respaldo ================= */
+function exportData(){
+  S.settings.lastExport = today(); save();
+  const blob = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `servicios-guia-${today()}.json`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  if (ui.tab === 'proveedores') render();
+  toast('Respaldo descargado');
+}
+function exportApp(){
+  S.settings.lastExport = today(); save();
+  const payload = Object.assign({}, S, {exportedAt: new Date().toISOString()});
+  const json = JSON.stringify(payload).replace(/</g, '\\u003c');
+  const open = '<script id="embeddedData" type="application/json">';
+  const i = APP_SOURCE.indexOf(open);
+  if (i < 0) return toast('No se pudo preparar el archivo');
+  const j = APP_SOURCE.indexOf('</' + 'script>', i + open.length);
+  const html = APP_SOURCE.slice(0, i + open.length) + json + APP_SOURCE.slice(j);
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `servicios-guia-con-datos-${today()}.html`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  if (ui.tab === 'proveedores') render();
+  toast(`App exportada con ${S.services.length} servicios · ábrela en la otra PC`);
+}
+$('#importFile').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const d = JSON.parse(rd.result);
+      if (!d || !Array.isArray(d.services)) throw new Error();
+      if (!confirm(`El respaldo tiene ${d.services.length} servicios. Esto reemplazará los datos actuales. ¿Continuar?`)) return;
+      S = normalize(d); save(); render(); toast('Respaldo importado');
+    } catch(err){ toast('Archivo no válido'); }
+    e.target.value = '';
+  };
+  rd.readAsText(file);
+});
+
+/* ================= Drawer y toast ================= */
+function openDrawer(html){ $('#drawerBody').innerHTML = html; document.body.classList.add('dr-open'); $('#drawerBody').scrollTop = 0; }
+function closeDrawer(){ document.body.classList.remove('dr-open'); ui.dayOpen = null; }
+let toastT;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2400); }
+
+/* ================= Eventos ================= */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t) return;
+  const a = t.dataset.act, id = t.dataset.id;
+  switch (a){
+    case 'tab': ui.tab = t.dataset.tab; closeDrawer(); render(); window.scrollTo(0,0); break;
+    case 'prev': ui.m--; if (ui.m < 0){ ui.m = 11; ui.y--; } render(); break;
+    case 'next': ui.m++; if (ui.m > 11){ ui.m = 0; ui.y++; } render(); break;
+    case 'today': ui.y = now.getFullYear(); ui.m = now.getMonth(); render(); break;
+    case 'view': ui.view = t.dataset.v; render(); break;
+    case 'new': openForm(null, t.dataset.date || (ui.tab === 'calendario' && (ui.y !== now.getFullYear() || ui.m !== now.getMonth()) ? ymd(new Date(ui.y, ui.m, 1)) : today())); break;
+    case 'cell': if (isMobile()) openDay(t.dataset.date); else openForm(null, t.dataset.date); break;
+    case 'day': openDay(t.dataset.date); break;
+    case 'edit': openForm(id); break;
+    case 'dup': openForm(null, null, S.services.find(x => x.id === id)); toast('Copia lista: ajusta la fecha y guarda'); break;
+    case 'del': delService(id); break;
+    case 'grp-done': grpDone(t.dataset.g); break;
+    case 'grp-pay': grpPay(t.dataset.g); break;
+    case 'grp-del': grpDel(t.dataset.g); break;
+    case 'done': markDone(id); break;
+    case 'pay': markPaid(id); break;
+    case 'close': closeDrawer(); break;
+    case 'apply-rate': { const f = $('#f'); f.elements.rate.value = t.dataset.v; ui.rateTouched = false; f.elements.pax.dispatchEvent(new Event('input')); break; }
+    case 'goto-rates': ui.rateSel = {prov:t.dataset.p, tour:t.dataset.t}; ui.tab = 'tarifas'; closeDrawer(); render(); break;
+    case 'rg-add': {
+      const r = getRateEntry(true), last = r.ranges.length ? r.ranges[r.ranges.length - 1] : null;
+      const start = last ? (last.max !== '' && last.max != null ? num(last.max) + 1 : num(last.min) + 1) : 1;
+      r.ranges.push({min:start, max:'', rate:''}); save(); renderTarifas(); break;
+    }
+    case 'rg-del': { const r = getRateEntry(false); if (r){ r.ranges.splice(+t.dataset.i, 1); if (!r.ranges.length) S.rates = S.rates.filter(x => x !== r); save(); renderTarifas(); } break; }
+    case 'rate-edit': ui.rateSel = {prov:t.dataset.p, tour:t.dataset.t}; renderTarifas(); window.scrollTo(0,0); break;
+    case 'rate-del': if (confirm('¿Eliminar todas las tarifas de esta combinación?')){ S.rates = S.rates.filter(r => r.id !== id); save(); renderTarifas(); } break;
+    case 'prov-add': { const i = $('#newProv'), v = i.value.trim(); if (v){ addProvider(v); render(); setTimeout(() => $('#newProv') && $('#newProv').focus(), 0); } break; }
+    case 'tour-add': { const i = $('#newTour'), v = i.value.trim(); if (v){ addTour(v); render(); setTimeout(() => $('#newTour') && $('#newTour').focus(), 0); } break; }
+    case 'prov-del': delProvider(id); break;
+    case 'tour-del': delTour(id); break;
+    case 'export': exportData(); break;
+    case 'export-app': exportApp(); break;
+    case 'import': $('#importFile').click(); break;
+  }
+});
+document.addEventListener('change', e => {
+  const t = e.target, c = t.dataset.chg; if (!c) return;
+  switch (c){
+    case 'dY': ui.dY = +t.value; renderDashboard(); break;
+    case 'dM': ui.dM = t.value === 'all' ? 'all' : +t.value; renderDashboard(); break;
+    case 'alertDays': S.settings.alertDays = Math.max(1, parseInt(t.value) || 15); save(); renderDashboard(); break;
+    case 'sv': { const k = t.dataset.k; ui.sv[k] = (k === 'y' || k === 'm') ? (t.value === 'all' ? 'all' : +t.value) : t.value; renderServices(); break; }
+    case 'rateProv': ui.rateSel.prov = t.value; renderTarifas(); break;
+    case 'rateTour': ui.rateSel.tour = t.value; renderTarifas(); break;
+    case 'rg': {
+      const r = getRateEntry(true), g = r.ranges[+t.dataset.i]; if (!g) return;
+      g[t.dataset.f] = t.value === '' ? '' : (t.dataset.f === 'rate' ? num(t.value) : parseInt(t.value));
+      save(); $('#rgWarn').textContent = rangeWarnings(r); $('#rateOverview').innerHTML = rateOverview(); break;
+    }
+    case 'prov-name': case 'tour-name': {
+      const arr = c === 'prov-name' ? S.providers : S.tours, x = arr.find(o => o.id === t.dataset.id), v = t.value.trim();
+      if (x && v){ x.name = v; save(); toast('Nombre actualizado'); } else if (x) t.value = x.name;
+      break;
+    }
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.body.classList.contains('dr-open')) closeDrawer();
+  if (e.key === 'Enter' && e.target.id === 'newProv') document.querySelector('[data-act="prov-add"]').click();
+  if (e.key === 'Enter' && e.target.id === 'newTour') document.querySelector('[data-act="tour-add"]').click();
+});
+
+save();
+render();
+</script>
+</body>
+</html>
