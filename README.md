@@ -1,4 +1,6 @@
-# Guiahub
+<p align="center"><img src="logo.svg" alt="GuiaHub" width="400"></p>
+
+# GuiaHub
 Tener control de tus finanzas como guía.
 
 **Mis Servicios de Guía** es una app de un solo archivo (`index.html`) para que un guía turístico registre sus servicios, tarifas y cobros. Funciona sin internet y sin instalar nada: basta con abrir el archivo en el navegador.
@@ -22,3 +24,8 @@ Los datos se guardan solo en el navegador donde usas la app (localStorage); no s
 Haz respaldos de vez en cuando: si borras los datos del navegador, se pierden.
 
 > No subas a este repositorio un archivo exportado *con datos*: el repositorio es público.
+
+## Logo
+
+- `logo.svg`: ícono con el nombre y el lema (se adapta a modo claro y oscuro).
+- `icono.svg`: solo el ícono — el Puente de las Américas delante de la torre El Tornillo.
