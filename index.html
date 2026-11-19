@@ -222,6 +222,9 @@ body.dr-open .drawer{transform:none}
 .priv p{margin:0 0 8px}
 .priv ul{margin:0 0 8px;padding-left:20px}
 .priv li{margin-bottom:3px}
+.priv ol{margin:0 0 8px;padding-left:22px}
+.priv ol li{margin-bottom:8px}
+.priv svg{width:18px;height:18px;vertical-align:-4px;stroke:var(--primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .priv a{color:var(--primary);font-weight:600}
 .priv .upd{color:var(--muted);font-size:13px}
 .priv table{margin:6px 0 10px}
@@ -434,7 +437,7 @@ main{padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, e
   <div class="top-in">
     <div class="brand">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true" focusable="false"><defs><linearGradient id="lg-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d8763"/><stop offset="1" stop-color="#1f4a36"/></linearGradient><path id="lg-tornillo" d="M41.1 46 C41.1 43.2 43.1 43.2 43.1 40.4 C43.1 37.6 41.5 37.6 41.5 34.8 C41.5 32 43.5 32 43.5 29.2 C43.5 26.4 41.9 26.4 41.9 23.6 C41.9 20.8 43.9 20.8 43.9 18 C43.9 15.2 42.3 15.2 42.3 12.4 Q42.6 8.5 47 7.5 Q49.6 8.5 49.9 12.4 C49.9 15.2 51.9 15.2 51.9 18 C51.9 20.8 50.3 20.8 50.3 23.6 C50.3 26.4 52.3 26.4 52.3 29.2 C52.3 32 50.7 32 50.7 34.8 C50.7 37.6 52.7 37.6 52.7 40.4 C52.7 43.2 51.1 43.2 51.1 46 Z"/><clipPath id="lg-torre"><use href="#lg-tornillo"/></clipPath><clipPath id="lg-sobre"><rect width="64" height="40"/></clipPath><path id="lg-cuerda" d="M1 40.5 Q7 39 13 35 Q32 8 51 35 Q57 39 63 40.5"/><path id="lg-arco" d="M14 49 Q32 19 50 49"/><path id="lg-celosia" d="M14 49 L16.8 30.1 L21.2 39.4 L24.4 23.7 L28.4 34.6 L32 21.5 L35.6 34.6 L39.6 23.7 L42.8 39.4 L47.2 30.1 L50 49 M3 40 L5.5 39 L8 40 L10.5 36.6 L13 40 M61 40 L58.5 39 L56 40 L53.5 36.6 L51 40"/><path id="lg-pendolas" d="M25 36.3 V40 M32 34 V40 M39 36.3 V40"/><path id="lg-tablero" d="M1 40 H63"/></defs><rect width="64" height="64" rx="15" fill="url(#lg-cielo)"/><circle cx="14" cy="15" r="5.5" fill="#e9b45a"/><g clip-path="url(#lg-sobre)"><path d="M47 7.5 V3.8" stroke="#f5efe3" stroke-width="1" stroke-linecap="round"/><use href="#lg-tornillo" fill="#f5efe3"/><g clip-path="url(#lg-torre)"><rect x="47.4" y="0" width="12" height="50" fill="#1f4a36" opacity=".18"/><path d="M38 47 L56 41.5 M38 41.4 L56 35.9 M38 35.8 L56 30.3 M38 30.2 L56 24.7 M38 24.6 L56 19.1 M38 19 L56 13.5 M38 13.4 L56 7.9" fill="none" stroke="#2f6b4f" stroke-width="1.4"/></g></g><g fill="none" stroke="#24533d" stroke-linecap="round" stroke-linejoin="round"><use href="#lg-cuerda" stroke-width="4.6"/><use href="#lg-arco" stroke-width="4.2"/><use href="#lg-tablero" stroke-width="4.8"/></g><g fill="#e3d7c0"><rect x="12" y="46.5" width="4" height="7.5" rx=".8"/><rect x="48" y="46.5" width="4" height="7.5" rx=".8"/></g><g stroke="#e3d7c0" stroke-width="1.6" stroke-linecap="round"><path d="M5 41.5 V53 M59 41.5 V53"/></g><g fill="none" stroke="#f5efe3" stroke-linecap="round" stroke-linejoin="round"><use href="#lg-cuerda" stroke-width="2.2"/><use href="#lg-arco" stroke-width="1.8"/><use href="#lg-celosia" stroke-width=".95"/><use href="#lg-pendolas" stroke-width=".9"/><use href="#lg-tablero" stroke-width="2.4"/></g><g fill="none" stroke="#f5efe3" stroke-linecap="round" stroke-width="1.3" opacity=".45"><path d="M18 56 q4 -2 8 0 t8 0 t8 0 t8 0"/><path d="M8 60 q4 -2 8 0 t8 0 t8 0 t8 0 t8 0 t8 0"/></g></svg>
-      <h1>Guia<span class="hub">Hub</span> <small class="ver" title="Versión 0.16">v0.16</small></h1>
+      <h1>Guia<span class="hub">Hub</span> <small class="ver" title="Versión 0.17">v0.17</small></h1>
     </div>
     <div class="hdr-actions">
       <button class="btn sm primary" data-act="export-app" title="Descargar esta app con todos tus datos dentro, para abrirla en otra PC">⇪ <span>Exportar a otra PC</span></button>
@@ -510,9 +513,10 @@ function normalize(d){
   });
   const rates = arr(d.rates).map(r => ({id: sid(r.id) || newId(), providerId: sid(r.providerId), tourId: sid(r.tourId),
     ranges: arr(r.ranges).map(g => ({min: g.min === '' ? '' : (parseInt(g.min) || 1), max: (g.max === '' || g.max == null) ? '' : (parseInt(g.max) || ''), rate: g.rate === '' ? '' : (parseFloat(g.rate) || 0)}))}));
-  const st = Object.assign({alertDays:15, lastExport:'', embedSeen:''}, (d.settings && typeof d.settings === 'object') ? d.settings : {});
+  const st = Object.assign({alertDays:15, lastExport:'', embedSeen:'', installSeen:''}, (d.settings && typeof d.settings === 'object') ? d.settings : {});
   st.alertDays = Math.max(1, parseInt(st.alertDays) || 15);
   st.lastExport = isDate(st.lastExport) ? st.lastExport : '';
+  st.installSeen = isDate(st.installSeen) ? st.installSeen : '';
   st.embedSeen = String(st.embedSeen ?? '');
   return {providers: arr(d.providers).map(named), tours: arr(d.tours).map(named), rates, services, settings: st};
 }
@@ -1361,8 +1365,8 @@ function renderProveedores(){
     </div>
   </div>
   <div class="card"><h3>Respaldo de datos</h3>
-    <p class="muted" style="margin-top:0">Los datos se guardan en este navegador. <b>Exportar a otra PC</b> descarga una copia de la app con todos tus datos dentro: cópiala a la otra PC (USB, correo, Drive) y ábrela; los datos se cargan solos. El respaldo JSON sirve para importarlo en una app que ya tengas abierta.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-act="export-app">⇪ Exportar a otra PC</button><button class="btn" data-act="export">⇩ Descargar respaldo JSON</button><button class="btn" data-act="import">⇧ Importar respaldo</button></div>
+    <p class="muted" style="margin-top:0">Los datos se guardan en este navegador. <b>Exportar a otra PC</b> descarga una copia de la app con todos tus datos dentro: cópiala a la otra PC (USB, correo, Drive) y ábrela; los datos se cargan solos. El respaldo JSON sirve para importarlo en una app que ya tengas abierta. En iPhone, "Guardar respaldo" abre el menú de compartir para guardarlo en Archivos/iCloud Drive o enviarlo por WhatsApp o correo.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-act="export-app">⇪ Exportar a otra PC</button><button class="btn" data-act="export">⇩ Guardar respaldo</button><button class="btn" data-act="import">⇧ Importar respaldo</button>${isIOS && !installed ? '<button class="btn" data-act="install">Instalar en el iPhone</button>' : ''}</div>
     <p class="muted">Último respaldo: ${le ? fmtDate(le) : 'nunca'} · ${S.services.length} servicios registrados</p>
   </div>`;
 }
@@ -1378,13 +1382,39 @@ function delTour(id){
 }
 
 /* ================= Respaldo ================= */
+const installed = matchMedia('(display-mode: standalone)').matches || !!navigator.standalone;
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function markExported(msg){ S.settings.lastExport = today(); save(); if (ui.tab === 'proveedores') render(); toast(msg); }
 function exportData(){
-  S.settings.lastExport = today(); save();
-  const blob = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `servicios-guia-${today()}.json`;
-  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-  if (ui.tab === 'proveedores') render();
-  toast('Respaldo descargado');
+  const json = JSON.stringify(S, null, 2), name = `servicios-guia-${today()}.json`;
+  const download = () => {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json], {type:'application/json'})); a.download = name;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    markExported('Respaldo descargado');
+  };
+  // share() debe llamarse en el mismo gesto del clic, sin awaits antes
+  try {
+    const file = new File([json], name, {type:'application/json'});
+    // solo en táctiles: en Windows Chrome/Edge también tienen share() y el usuario espera una descarga
+    if ((isIOS || matchMedia('(pointer: coarse)').matches) && navigator.canShare?.({files:[file]})) {
+      navigator.share({files:[file], title:'Respaldo GuiaHub'}).then(() => markExported('Respaldo listo'), err => { if (err?.name !== 'AbortError') download(); });
+      return;
+    }
+  } catch(_){}
+  download();
+}
+function openInstall(){
+  openDrawer(`<div class="dr-head"><h3>Instalar en el iPhone</h3><button class="icon-btn" data-act="close" aria-label="Cerrar">✕</button></div>
+<article class="priv">
+<ol>
+<li>Abre el link de GuiaHub en Safari.</li>
+<li>Toca el botón Compartir <svg viewBox="0 0 24 24" aria-label="Compartir"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg> (cuadrado con una flecha hacia arriba).</li>
+<li>Elige "Agregar a pantalla de inicio" y toca "Agregar".</li>
+<li>Abre GuiaHub desde su ícono en la pantalla de inicio.</li>
+</ol>
+<p>La app instalada guarda sus datos aparte de Safari. Si ya tienes servicios aquí, primero guarda un respaldo y luego impórtalo dentro de la app instalada (Proveedores y tours, "Importar respaldo").</p>
+<p><button class="btn primary" data-act="export">⇩ Guardar respaldo</button></p>
+</article>`);
 }
 function exportApp(){
   S.settings.lastExport = today(); save();
@@ -1453,7 +1483,7 @@ function openPriv(){
 <p>GuiaHub se ofrece como herramienta de apoyo. No sustituye tu contabilidad ni asesoría fiscal. El desarrollador no recibe ni custodia tus datos y no responde por el uso que hagas de la información ni por la pérdida de datos que no se hayan respaldado.</p>
 <h4>9. Cambios a esta política</h4>
 <p>Esta política puede actualizarse. La fecha de arriba indica la última versión.</p>
-<p class="credit">GuiaHub v0.16 · Desarrollada por Ricardo Espino G.</p>
+<p class="credit">GuiaHub v0.17 · Desarrollada por Ricardo Espino G.</p>
 </article>`);
 }
 function openDrawer(html){ $('#drawerBody').innerHTML = html; document.body.classList.add('dr-open'); $('#drawerBody').scrollTop = 0; formDirty = false; }
@@ -1570,6 +1600,7 @@ document.addEventListener('click', e => {
     case 'export-app': exportApp(); break;
     case 'import': $('#importFile').click(); break;
     case 'priv': openPriv(); break;
+    case 'install': openInstall(); break;
   }
 });
 document.addEventListener('change', e => {
@@ -1648,9 +1679,11 @@ if (new URLSearchParams(location.search).has('test')) selfTest();
 if (loadDamaged) toast(`⚠ Los datos guardados estaban dañados${loadDamaged === 'copia' ? ' (se guardó una copia)' : ''}. Importa tu último respaldo.`, 9000);
 else {
   // Safari borra los datos de un sitio tras 7 días sin abrirlo; instalada en la pantalla de inicio no los borra
-  const installed = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
   const le = S.settings.lastExport;
-  if (!installed && S.services.length && (!le || daysBetween(le, today()) > 7))
+  if (isIOS && !installed && !S.settings.installSeen) {
+    S.settings.installSeen = today(); save();
+    setTimeout(openInstall, 800);
+  } else if (!installed && S.services.length && (!le || daysBetween(le, today()) > 7))
     setTimeout(() => toast('Haz un respaldo o agrega GuiaHub a la pantalla de inicio: Safari puede borrar los datos tras 7 días sin uso.', 8000), 800);
 }
 navigator.storage?.persist?.().catch(() => {});
