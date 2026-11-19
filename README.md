@@ -18,9 +18,7 @@ Tener control de tus finanzas como guía.
 
 Los datos se guardan solo en el navegador donde usas la app (localStorage); no se envían a ningún servidor.
 
-- **Exportar a otra PC** descarga una copia de la app con tus datos dentro, para abrirla en otro equipo.
-- **Respaldo / Importar** descarga o carga un archivo JSON.
-
+- **Exportar datos** guarda un archivo .json con tus datos; **Importar datos** lo carga en otro equipo.
 Haz respaldos de vez en cuando: si borras los datos del navegador, se pierden.
 
 > No subas a este repositorio un archivo exportado *con datos*: el repositorio es público.

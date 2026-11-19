@@ -437,11 +437,10 @@ main{padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, e
   <div class="top-in">
     <div class="brand">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true" focusable="false"><defs><linearGradient id="lg-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d8763"/><stop offset="1" stop-color="#1f4a36"/></linearGradient><path id="lg-tornillo" d="M41.1 46 C41.1 43.2 43.1 43.2 43.1 40.4 C43.1 37.6 41.5 37.6 41.5 34.8 C41.5 32 43.5 32 43.5 29.2 C43.5 26.4 41.9 26.4 41.9 23.6 C41.9 20.8 43.9 20.8 43.9 18 C43.9 15.2 42.3 15.2 42.3 12.4 Q42.6 8.5 47 7.5 Q49.6 8.5 49.9 12.4 C49.9 15.2 51.9 15.2 51.9 18 C51.9 20.8 50.3 20.8 50.3 23.6 C50.3 26.4 52.3 26.4 52.3 29.2 C52.3 32 50.7 32 50.7 34.8 C50.7 37.6 52.7 37.6 52.7 40.4 C52.7 43.2 51.1 43.2 51.1 46 Z"/><clipPath id="lg-torre"><use href="#lg-tornillo"/></clipPath><clipPath id="lg-sobre"><rect width="64" height="40"/></clipPath><path id="lg-cuerda" d="M1 40.5 Q7 39 13 35 Q32 8 51 35 Q57 39 63 40.5"/><path id="lg-arco" d="M14 49 Q32 19 50 49"/><path id="lg-celosia" d="M14 49 L16.8 30.1 L21.2 39.4 L24.4 23.7 L28.4 34.6 L32 21.5 L35.6 34.6 L39.6 23.7 L42.8 39.4 L47.2 30.1 L50 49 M3 40 L5.5 39 L8 40 L10.5 36.6 L13 40 M61 40 L58.5 39 L56 40 L53.5 36.6 L51 40"/><path id="lg-pendolas" d="M25 36.3 V40 M32 34 V40 M39 36.3 V40"/><path id="lg-tablero" d="M1 40 H63"/></defs><rect width="64" height="64" rx="15" fill="url(#lg-cielo)"/><circle cx="14" cy="15" r="5.5" fill="#e9b45a"/><g clip-path="url(#lg-sobre)"><path d="M47 7.5 V3.8" stroke="#f5efe3" stroke-width="1" stroke-linecap="round"/><use href="#lg-tornillo" fill="#f5efe3"/><g clip-path="url(#lg-torre)"><rect x="47.4" y="0" width="12" height="50" fill="#1f4a36" opacity=".18"/><path d="M38 47 L56 41.5 M38 41.4 L56 35.9 M38 35.8 L56 30.3 M38 30.2 L56 24.7 M38 24.6 L56 19.1 M38 19 L56 13.5 M38 13.4 L56 7.9" fill="none" stroke="#2f6b4f" stroke-width="1.4"/></g></g><g fill="none" stroke="#24533d" stroke-linecap="round" stroke-linejoin="round"><use href="#lg-cuerda" stroke-width="4.6"/><use href="#lg-arco" stroke-width="4.2"/><use href="#lg-tablero" stroke-width="4.8"/></g><g fill="#e3d7c0"><rect x="12" y="46.5" width="4" height="7.5" rx=".8"/><rect x="48" y="46.5" width="4" height="7.5" rx=".8"/></g><g stroke="#e3d7c0" stroke-width="1.6" stroke-linecap="round"><path d="M5 41.5 V53 M59 41.5 V53"/></g><g fill="none" stroke="#f5efe3" stroke-linecap="round" stroke-linejoin="round"><use href="#lg-cuerda" stroke-width="2.2"/><use href="#lg-arco" stroke-width="1.8"/><use href="#lg-celosia" stroke-width=".95"/><use href="#lg-pendolas" stroke-width=".9"/><use href="#lg-tablero" stroke-width="2.4"/></g><g fill="none" stroke="#f5efe3" stroke-linecap="round" stroke-width="1.3" opacity=".45"><path d="M18 56 q4 -2 8 0 t8 0 t8 0 t8 0"/><path d="M8 60 q4 -2 8 0 t8 0 t8 0 t8 0 t8 0 t8 0"/></g></svg>
-      <h1>Guia<span class="hub">Hub</span> <small class="ver" title="Versión 0.17">v0.17</small></h1>
+      <h1>Guia<span class="hub">Hub</span> <small class="ver" title="Versión 0.18">v0.18</small></h1>
     </div>
     <div class="hdr-actions">
-      <button class="btn sm primary" data-act="export-app" title="Descargar esta app con todos tus datos dentro, para abrirla en otra PC">⇪ <span>Exportar a otra PC</span></button>
-      <button class="btn sm" data-act="export" title="Descargar respaldo JSON">⇩ <span>Respaldo</span></button>
+      <button class="btn sm primary" data-act="export" title="Guardar un respaldo de tus datos">⇩ <span>Exportar datos</span></button>
       <button class="btn sm" data-act="import" title="Importar respaldo JSON">⇧ <span>Importar</span></button>
       <input type="file" id="importFile" accept="application/json,.json" class="hide">
     </div>
@@ -476,11 +475,7 @@ main{padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, e
 <aside class="drawer" aria-label="Panel"><div class="grabber" aria-hidden="true"></div><div id="drawerBody"></div></aside>
 <div class="toast" id="toast"></div>
 
-<script id="embeddedData" type="application/json"></script>
 <script>
-/* Copia limpia del HTML (antes de pintar nada) para poder exportar la app con datos */
-const APP_SOURCE = '<!doctype html>\n' + document.documentElement.outerHTML;
-
 /* ================= Datos ================= */
 const LS_KEY = 'guiaServicios_v1';
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -513,20 +508,11 @@ function normalize(d){
   });
   const rates = arr(d.rates).map(r => ({id: sid(r.id) || newId(), providerId: sid(r.providerId), tourId: sid(r.tourId),
     ranges: arr(r.ranges).map(g => ({min: g.min === '' ? '' : (parseInt(g.min) || 1), max: (g.max === '' || g.max == null) ? '' : (parseInt(g.max) || ''), rate: g.rate === '' ? '' : (parseFloat(g.rate) || 0)}))}));
-  const st = Object.assign({alertDays:15, lastExport:'', embedSeen:'', installSeen:''}, (d.settings && typeof d.settings === 'object') ? d.settings : {});
+  const st = Object.assign({alertDays:15, lastExport:'', installSeen:''}, (d.settings && typeof d.settings === 'object') ? d.settings : {});
   st.alertDays = Math.max(1, parseInt(st.alertDays) || 15);
   st.lastExport = isDate(st.lastExport) ? st.lastExport : '';
   st.installSeen = isDate(st.installSeen) ? st.installSeen : '';
-  st.embedSeen = String(st.embedSeen ?? '');
   return {providers: arr(d.providers).map(named), tours: arr(d.tours).map(named), rates, services, settings: st};
-}
-function readEmbedded(){
-  try {
-    const t = document.getElementById('embeddedData').textContent.trim();
-    if (!t) return null;
-    const d = JSON.parse(t);
-    return (d && Array.isArray(d.services)) ? d : null;
-  } catch(e){ return null; }
 }
 let loadDamaged = false;
 function load(){
@@ -538,20 +524,6 @@ function load(){
     if (r){
       loadDamaged = 'sin copia';
       try { localStorage.setItem(LS_KEY + '_danado', r); loadDamaged = 'copia'; } catch(_){}
-    }
-  }
-  const emb = readEmbedded();
-  if (emb){
-    const stamp = emb.exportedAt || 'sin-fecha';
-    const hasLocal = local && (local.services.length || local.providers.length || local.tours.length);
-    if (!hasLocal){
-      const d = normalize(emb); d.settings.embedSeen = stamp; return d;
-    }
-    if (local.settings.embedSeen !== stamp){
-      const when = emb.exportedAt ? new Date(emb.exportedAt).toLocaleString('es-PA') : 'fecha desconocida';
-      const ok = confirm(`Este archivo trae datos exportados el ${when} (${emb.services.length} servicios).\n\nEste navegador ya tiene ${local.services.length} servicios guardados.\n\nAceptar: usar los datos del archivo (reemplaza los de este navegador).\nCancelar: conservar los datos de este navegador.`);
-      if (ok){ const d = normalize(emb); d.settings.embedSeen = stamp; return d; }
-      local.settings.embedSeen = stamp;
     }
   }
   return local || normalize({});
@@ -1365,8 +1337,8 @@ function renderProveedores(){
     </div>
   </div>
   <div class="card"><h3>Respaldo de datos</h3>
-    <p class="muted" style="margin-top:0">Los datos se guardan en este navegador. <b>Exportar a otra PC</b> descarga una copia de la app con todos tus datos dentro: cópiala a la otra PC (USB, correo, Drive) y ábrela; los datos se cargan solos. El respaldo JSON sirve para importarlo en una app que ya tengas abierta. En iPhone, "Guardar respaldo" abre el menú de compartir para guardarlo en Archivos/iCloud Drive o enviarlo por WhatsApp o correo.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-act="export-app">⇪ Exportar a otra PC</button><button class="btn" data-act="export">⇩ Guardar respaldo</button><button class="btn" data-act="import">⇧ Importar respaldo</button>${isIOS && !installed ? '<button class="btn" data-act="install">Instalar en el iPhone</button>' : ''}</div>
+    <p class="muted" style="margin-top:0">Los datos se guardan en este navegador. <b>Exportar datos</b> guarda un archivo con todos tus datos; con <b>Importar datos</b> lo cargas en otro equipo o en la app instalada. En el iPhone, exportar abre el menú de compartir para guardarlo en Archivos/iCloud Drive o enviarlo por WhatsApp o correo.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-act="export">⇩ Exportar datos</button><button class="btn" data-act="import">⇧ Importar datos</button>${isIOS && !installed ? '<button class="btn" data-act="install">Instalar en el iPhone</button>' : ''}</div>
     <p class="muted">Último respaldo: ${le ? fmtDate(le) : 'nunca'} · ${S.services.length} servicios registrados</p>
   </div>`;
 }
@@ -1412,24 +1384,9 @@ function openInstall(){
 <li>Elige "Agregar a pantalla de inicio" y toca "Agregar".</li>
 <li>Abre GuiaHub desde su ícono en la pantalla de inicio.</li>
 </ol>
-<p>La app instalada guarda sus datos aparte de Safari. Si ya tienes servicios aquí, primero guarda un respaldo y luego impórtalo dentro de la app instalada (Proveedores y tours, "Importar respaldo").</p>
-<p><button class="btn primary" data-act="export">⇩ Guardar respaldo</button></p>
+<p>La app instalada guarda sus datos aparte de Safari. Si ya tienes servicios aquí, primero exporta tus datos y luego impórtalos dentro de la app instalada (Proveedores y tours, "Importar datos").</p>
+<p><button class="btn primary" data-act="export">⇩ Exportar datos</button></p>
 </article>`);
-}
-function exportApp(){
-  S.settings.lastExport = today(); save();
-  const payload = Object.assign({}, S, {exportedAt: new Date().toISOString()});
-  const json = JSON.stringify(payload).replace(/</g, '\\u003c');
-  const open = '<script id="embeddedData" type="application/json">';
-  const i = APP_SOURCE.indexOf(open);
-  if (i < 0) return toast('No se pudo preparar el archivo');
-  const j = APP_SOURCE.indexOf('</' + 'script>', i + open.length);
-  const html = APP_SOURCE.slice(0, i + open.length) + json + APP_SOURCE.slice(j);
-  const blob = new Blob([html], {type:'text/html'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `servicios-guia-con-datos-${today()}.html`;
-  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-  if (ui.tab === 'proveedores') render();
-  toast(`App exportada con ${S.services.length} servicios · ábrela en la otra PC`);
 }
 $('#importFile').addEventListener('change', e => {
   const file = e.target.files[0]; if (!file) return;
@@ -1469,8 +1426,7 @@ function openPriv(){
 <p>Lo que la app no recoge:</p>
 <ul><li>tu ubicación;</li><li>contactos, datos del teléfono ni información de otras apps;</li><li>estadísticas de uso, publicidad ni cookies de rastreo.</li></ul>
 <h4>4. Cuándo salen datos de tu dispositivo</h4>
-<p>Solo cuando tú lo decides, al:</p>
-<ul><li>usar "Exportar a otra PC", que descarga una copia de la app con tus datos dentro;</li><li>descargar un respaldo (archivo .json).</li></ul>
+<p>Solo cuando tú lo decides, al usar "Exportar datos", que guarda un archivo .json con tus datos donde elijas (descarga, Archivos/iCloud Drive, WhatsApp o correo).</p>
 <p>Desde ese momento el archivo queda bajo tu responsabilidad y la de quien lo reciba. Los respaldos no están cifrados: guárdalos en un lugar seguro.</p>
 <h4>5. Cuánto tiempo se guardan</h4>
 <p>Los datos permanecen en el dispositivo hasta que los borres desde la app o borres los datos del sitio en el navegador. Safari puede borrarlos si pasas 7 días sin abrir la app y no la agregaste a la pantalla de inicio, y cualquier navegador puede hacerlo si al dispositivo le falta espacio. Haz respaldos con frecuencia.</p>
@@ -1478,12 +1434,12 @@ function openPriv(){
 <p>Para proteger tu información:</p>
 <ul><li>usa bloqueo de pantalla en el dispositivo;</li><li>guarda los respaldos en un lugar seguro.</li></ul>
 <h4>7. Tus datos, bajo tu control</h4>
-<p>Desde la app puedes ver y corregir tus datos editando cada servicio, borrarlos con "Eliminar" y llevártelos con "Respaldo" o "Exportar a otra PC".</p>
+<p>Desde la app puedes ver y corregir tus datos editando cada servicio, borrarlos con "Eliminar" y llevártelos con "Exportar datos".</p>
 <h4>8. Responsabilidad</h4>
 <p>GuiaHub se ofrece como herramienta de apoyo. No sustituye tu contabilidad ni asesoría fiscal. El desarrollador no recibe ni custodia tus datos y no responde por el uso que hagas de la información ni por la pérdida de datos que no se hayan respaldado.</p>
 <h4>9. Cambios a esta política</h4>
 <p>Esta política puede actualizarse. La fecha de arriba indica la última versión.</p>
-<p class="credit">GuiaHub v0.17 · Desarrollada por Ricardo Espino G.</p>
+<p class="credit">GuiaHub v0.18 · Desarrollada por Ricardo Espino G.</p>
 </article>`);
 }
 function openDrawer(html){ $('#drawerBody').innerHTML = html; document.body.classList.add('dr-open'); $('#drawerBody').scrollTop = 0; formDirty = false; }
@@ -1597,7 +1553,6 @@ document.addEventListener('click', e => {
     case 'prov-del': delProvider(id); break;
     case 'tour-del': delTour(id); break;
     case 'export': exportData(); break;
-    case 'export-app': exportApp(); break;
     case 'import': $('#importFile').click(); break;
     case 'priv': openPriv(); break;
     case 'install': openInstall(); break;
